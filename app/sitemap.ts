@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = 'https://footballx.app';
+  const base = 'https://anistreambd.vercel.app';
   const now = new Date();
 
   const staticRoutes = [
