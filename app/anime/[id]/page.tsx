@@ -1,17 +1,46 @@
-import { fetchAnimeDetail, fetchTopRated, getTitle, GENRES } from '@/services/anime/anilist';
+import { fetchAnimeDetail, getTitle } from '@/services/anime/anilist';
+import { findTmdbTvIdByTitle } from '@/services/movies/tmdb';
 import AnimeCard from '@/components/anime/AnimeCard';
+import MultiServerPlayer, { ServerConfig } from '@/components/player/MultiServerPlayer';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { Star, Clock, Play, Calendar, ChevronLeft, Tv2, Info, Sparkles, HelpCircle } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Tv2, Info, Sparkles } from 'lucide-react';
 
 export const revalidate = 600;
+
+function getSeasonFromTitle(title: string): number {
+  const t = title.toLowerCase();
+  if (t.includes('season 5') || t.includes('5th season')) return 5;
+  if (t.includes('season 4') || t.includes('4th season')) return 4;
+  if (t.includes('season 3') || t.includes('3rd season') || t.includes('swordsmith') || t.includes('swordsmith village')) return 3;
+  if (t.includes('season 2') || t.includes('2nd season') || t.includes('entertainment district') || t.includes('mugen train')) return 2;
+  return 1;
+}
+
+function cleanTitleForTmdb(title: string): string {
+  return title
+    .replace(/(?:season\s+\d+|2nd\s+season|3rd\s+season|4th\s+season|5th\s+season|\d+nd\s+season|\d+rd\s+season|\d+th\s+season)/gi, '')
+    .replace(/(?:part\s+\d+|part\s+[a-z]+)/gi, '')
+    .replace(/\s+-\s+.*$/gi, '')
+    .trim();
+}
+
+function getShortTitle(title: string): string {
+  let t = title;
+  t = t.replace(/Kimetsu no Yaiba/gi, 'Demon Slayer');
+  t = t.replace(/Jujutsu Kaisen/gi, 'JJK');
+  t = t.replace(/Shingeki no Kyojin/gi, 'AOT');
+  t = t.replace(/Boku no Hero Academia/gi, 'MHA');
+  t = t.replace(/Season\s*/gi, 'S');
+  return t;
+}
 
 export default async function AnimeDetailPage({
   params,
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ ep?: string; server?: string; lang?: string }>;
+  searchParams: Promise<{ ep?: string }>;
 }) {
   const resolvedParams = await params;
   const resolvedSearchParams = await searchParams;
@@ -26,28 +55,45 @@ export default async function AnimeDetailPage({
   }
 
   const ep = resolvedSearchParams.ep ? parseInt(resolvedSearchParams.ep) : 1;
-  const server = resolvedSearchParams.server || 'animeplay-ani'; // Default to AnimePlay (Server 1)
-  const lang = resolvedSearchParams.lang || 'sub'; // Default to SUB
   const title = getTitle(anime);
 
-  // Generate embed URL
-  let embedUrl = '';
   const streamId = anime.idMal || anime.id;
+  const slugTitle = anime.title.romaji?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || '';
 
-  if (server === 'animeplay-ani') {
-    embedUrl = `https://animeplay.cfd/stream/ani/${anime.id}/${ep}/${lang}`;
-  } else if (server === 'animeplay-mal') {
-    embedUrl = `https://animeplay.cfd/stream/mal/${streamId}/${ep}/${lang}`;
-  } else if (server === 'vidsrc-to') {
-    embedUrl = `https://vidsrc.to/embed/anime/${streamId}/${ep}`;
-  } else if (server === 'vidsrc-me') {
-    embedUrl = `https://vidsrc.me/embed/anime/${streamId}/${ep}`;
-  } else if (server === 'animeplay-backup') {
-    embedUrl = `https://animeplay.cfd/stream/ani/${anime.id}/${ep}/${lang === 'hindi' ? 'dub' : lang}`;
-  } else {
-    // Default fallback to Server 1
-    embedUrl = `https://animeplay.cfd/stream/ani/${anime.id}/${ep}/${lang}`;
-  }
+  // Resolve TMDB TV ID and Season for TMDB-based providers (like embed.su, vidsrc.in/xyz, moviesapi)
+  const tmdbSearchTitle = cleanTitleForTmdb(title);
+  const resolvedTmdbId = await findTmdbTvIdByTitle(tmdbSearchTitle) || await findTmdbTvIdByTitle(title) || streamId;
+  const tmdbSeason = getSeasonFromTitle(title);
+
+  // ── Build the full server list ────────────────────────────────────────
+  const servers: ServerConfig[] = [
+    // 🎌 SUB Servers
+    { name: 'Main Server 1',  icon: '🎌', lang: 'SUB', url: `https://animeplay.cfd/stream/ani/${anime.id}/${ep}/sub` },
+    { name: 'Main Server 2',  icon: '📺', lang: 'SUB', url: `https://animeplay.cfd/stream/mal/${streamId}/${ep}/sub` },
+    { name: 'Main Server 3',  icon: '🔥', lang: 'SUB', url: `https://vidsrc.to/embed/anime/${streamId}/${ep}` },
+    { name: 'Main Server 4',  icon: '🌎', lang: 'SUB', url: `https://vidsrc.me/embed/anime/${streamId}/${ep}` },
+    { name: 'Main Server 5',  icon: '🐉', lang: 'SUB', url: `https://gogoanime3.cc/embed/${slugTitle}-episode-${ep}` },
+    { name: 'Main Server 6',  icon: '💎', lang: 'SUB', url: `https://animepahe.ru/anime/${anime.id}` },
+    { name: 'Main Server 7',  icon: '🌸', lang: 'SUB', url: `https://sudatchi.com/watch/${anime.id}/${ep}` },
+    { name: 'Main Server 8',  icon: '⚡', lang: 'SUB', url: `https://aniwatch.to/anime/${anime.id}/${ep}` },
+    { name: 'Main Server 9',  icon: '☁️', lang: 'SUB', url: `https://anime.uniquestream.net/embed/anime/${streamId}/${ep}` },
+    { name: 'Main Server 10', icon: '🌟', lang: 'SUB', url: `https://vidlink.pro/embed/anime/${streamId}/${ep}` },
+
+    // 🇺🇸 DUB Servers
+    { name: 'Main Server 1',  icon: '🎌', lang: 'DUB', url: `https://animeplay.cfd/stream/ani/${anime.id}/${ep}/dub` },
+    { name: 'Main Server 2',  icon: '📺', lang: 'DUB', url: `https://animeplay.cfd/stream/mal/${streamId}/${ep}/dub` },
+    { name: 'Main Server 3',  icon: '🐉', lang: 'DUB', url: `https://gogoanime3.cc/embed/${slugTitle}-dub-episode-${ep}` },
+    { name: 'Main Server 4',  icon: '☁️', lang: 'DUB', url: `https://animeplay.cfd/stream/ani/${anime.id}/${ep}/dub` },
+    { name: 'Main Server 5',  icon: '🔥', lang: 'DUB', url: `https://vidlink.pro/embed/anime/${streamId}/${ep}?dub=true` },
+
+    // 🇮🇳 Hindi Dubbed Servers
+    { name: 'Hindi Server 1', icon: '🇮🇳', lang: 'HI', url: `https://vidsrc.to/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    { name: 'Hindi Server 2', icon: '🇮🇳', lang: 'HI', url: `https://vidsrc.me/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    { name: 'Hindi Server 3', icon: '🇮🇳', lang: 'HI', url: `https://vidsrc.pm/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    { name: 'Hindi Server 4', icon: '🇮🇳', lang: 'HI', url: `https://embed.su/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    { name: 'Hindi Server 5', icon: '🇮🇳', lang: 'HI', url: `https://vidsrc.xyz/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    { name: 'Hindi Server 6', icon: '🇮🇳', lang: 'HI', url: `https://vidsrc.rip/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+  ];
 
   const totalEpisodes = Math.max(
     anime.episodes || 0,
@@ -72,7 +118,7 @@ export default async function AnimeDetailPage({
         <div className="absolute inset-0 bg-[#0a0a0f]/40" />
       </div>
 
-      <div className="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 -mt-48 relative z-10 pb-20">
+      <div className="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 -mt-48 pt-16 relative z-10 pb-20">
         
         {/* Back Link */}
         <Link href="/" className="inline-flex items-center gap-2 text-sm text-[#999] hover:text-white transition-colors mb-6">
@@ -88,108 +134,101 @@ export default async function AnimeDetailPage({
             {/* Title above player on mobile */}
             <div className="lg:hidden mb-4">
               <h1 className="text-2xl md:text-3xl font-black mb-1">{title}</h1>
-              <p className="text-xs text-[#8B5CF6] font-extrabold">Episode {ep} of {totalEpisodes} ({lang.toUpperCase()})</p>
+              <p className="text-xs text-[#8B5CF6] font-extrabold">Episode {ep} of {totalEpisodes}</p>
             </div>
 
-            {/* Embedded Player */}
-            <div className="relative aspect-video w-full rounded-[24px] overflow-hidden bg-[#0c0c12] border border-white/[0.06] shadow-2xl shadow-black/80">
-              <iframe
-                src={embedUrl}
-                className="w-full h-full"
-                allowFullScreen
-                referrerPolicy="origin"
-              />
+            {/* Episode Prev/Next Navigation */}
+            <div className="flex items-center justify-between">
+              <Link
+                href={ep > 1 ? `/anime/${anime.id}?ep=${ep - 1}` : '#'}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                  ep > 1
+                    ? 'bg-white/[0.04] border-white/[0.08] text-[#999] hover:text-white hover:border-[#8B5CF6]/40'
+                    : 'bg-white/[0.02] border-white/[0.03] text-[#444] cursor-not-allowed'
+                }`}
+              >
+                <ChevronLeft className="w-4 h-4" /> Prev Episode
+              </Link>
+              <span className="text-xs font-black text-[#8B5CF6] bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 px-4 py-2 rounded-xl">
+                Episode {ep} / {totalEpisodes}
+              </span>
+              <Link
+                href={ep < totalEpisodes ? `/anime/${anime.id}?ep=${ep + 1}` : '#'}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                  ep < totalEpisodes
+                    ? 'bg-gradient-to-r from-[#8B5CF6]/10 to-[#EC4899]/10 border-[#8B5CF6]/20 text-[#A78BFA] hover:text-white hover:border-[#8B5CF6]/50'
+                    : 'bg-white/[0.02] border-white/[0.03] text-[#444] cursor-not-allowed'
+                }`}
+              >
+                Next Episode <ChevronRight className="w-4 h-4" />
+              </Link>
             </div>
 
-            {/* Server & Language Selectors */}
-            <div className="flex flex-col sm:flex-row gap-4 bg-[#111118] border border-white/[0.06] p-4 rounded-3xl justify-between items-center">
+            {/* Embedded MultiServerPlayer */}
+            <MultiServerPlayer servers={servers} title={title} />
+
+            {/* Episode & Season Grid Selector */}
+            <div className="bg-[#111118] border border-white/[0.06] p-6 rounded-[24px] space-y-6">
               
-              {/* Server selector */}
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs text-[#555] font-black uppercase tracking-wider ml-1 mr-1">Server:</span>
-                {[
-                  { id: 'animeplay-ani', name: 'Server 1 (Direct)', color: 'from-[#8B5CF6] to-[#7C3AED]' },
-                  { id: 'animeplay-mal', name: 'Server 2 (MAL)', color: 'from-[#EC4899] to-[#DB2777]' },
-                  { id: 'vidsrc-to', name: 'Server 3 (VidsrcTo)', color: 'from-[#10B981] to-[#059669]' },
-                  { id: 'vidsrc-me', name: 'Server 4 (VidsrcMe)', color: 'from-[#3B82F6] to-[#2563EB]' },
-                  { id: 'animeplay-backup', name: 'Server 5 (Backup)', color: 'from-[#F59E0B] to-[#D97706]' },
-                ].map((srv) => (
-                  <Link
-                    key={srv.id}
-                    href={`/anime/${anime.id}?ep=${ep}&server=${srv.id}&lang=${lang === 'hindi' ? 'sub' : lang}`}
-                    className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${
-                      server === srv.id
-                        ? `bg-gradient-to-r ${srv.color} text-white shadow-[0_0_15px_rgba(139,92,246,0.3)]`
-                        : 'bg-white/[0.04] text-[#999] hover:text-white hover:bg-white/[0.08]'
-                    }`}
-                  >
-                    {srv.name}
-                  </Link>
-                ))}
-              </div>
+              {/* Seasons Switcher */}
+              {anime.relations?.nodes && anime.relations.nodes.filter((rel: any) => rel.format === 'TV' || rel.format === 'MOVIE' || rel.format === 'OVA' || rel.format === 'ONA').length > 0 && (
+                <div>
+                  <span className="text-[10px] text-[#555] font-black uppercase tracking-widest block mb-3">Seasons & Movies</span>
+                  <div className="flex flex-wrap gap-2">
+                    {/* Current Season */}
+                    <div className="px-4 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] text-white shadow-[0_0_15px_rgba(139,92,246,0.3)] border border-[#8B5CF6]/50">
+                      {getShortTitle(title)} (Current)
+                    </div>
+                    
+                    {/* Other Related Seasons */}
+                    {anime.relations.nodes
+                      .filter((rel: any) => rel.format === 'TV' || rel.format === 'MOVIE' || rel.format === 'OVA' || rel.format === 'ONA')
+                      .map((rel: any) => {
+                        const relTitle = getTitle(rel);
+                        return (
+                          <Link
+                            key={rel.id}
+                            href={`/anime/${rel.id}`}
+                            className="px-4 py-2 rounded-xl text-xs font-black bg-white/[0.04] text-[#999] hover:text-white border border-white/[0.06] hover:bg-white/[0.08] transition-all"
+                            title={relTitle}
+                          >
+                            {getShortTitle(relTitle)}
+                          </Link>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
 
-              {/* Language Selector (Sub/Dub) */}
-              <div className="flex items-center gap-1.5 bg-[#0e0e14] p-1 rounded-2xl border border-white/[0.04] shrink-0 self-end sm:self-auto">
-                {[
-                  { id: 'sub', name: 'SUB' },
-                  { id: 'dub', name: 'DUB' },
-                ].map((language) => (
-                  <Link
-                    key={language.id}
-                    href={`/anime/${anime.id}?ep=${ep}&server=${server}&lang=${language.id}`}
-                    className={`px-4 py-2 rounded-xl text-xs font-black transition-all duration-300 ${
-                      lang === language.id
-                        ? 'bg-[#8B5CF6] text-white shadow-[0_0_10px_rgba(139,92,246,0.3)]'
-                        : 'text-[#999] hover:text-white'
-                    }`}
-                  >
-                    {language.name}
-                  </Link>
-                ))}
-              </div>
+              {/* Divider if Seasons Switcher is present */}
+              {anime.relations?.nodes && anime.relations.nodes.filter((rel: any) => rel.format === 'TV' || rel.format === 'MOVIE' || rel.format === 'OVA' || rel.format === 'ONA').length > 0 && (
+                <div className="border-t border-white/[0.04]" />
+              )}
 
-            </div>
-
-            {/* Hindi Dub Info Alert */}
-            <div className="bg-[#111118] border border-blue-500/20 p-5 rounded-[24px] flex gap-4 items-start">
-              <div className="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
-                <HelpCircle className="w-5 h-5 text-blue-400" />
-              </div>
-              <div className="space-y-1">
-                <h4 className="text-sm font-black text-white">হিন্দি ডাব (Hindi Dub) দেখতে চান?</h4>
-                <p className="text-xs text-[#888] leading-relaxed">
-                  ফ্রি এনিমে সার্ভারগুলো (যেমন GogoAnime/HiAnime) হিন্দি ডাব করা এনিমেগুলোকে মূল প্লেয়ারের ভেতর আলাদা অডিও ট্র্যাক হিসেবে রাখে না। এগুলো সম্পূর্ণ আলাদা ফাইল হিসেবে আপলোড করা হয়। 
-                  তাই এই প্লেয়ারগুলোতে হিন্দি অডিও ট্র্যাক সরাসরি সিলেক্ট করা সম্ভব নয়।
-                </p>
-                <p className="text-xs text-[#aaa] font-semibold pt-1">
-                  💡 অফিশিয়ালি হিন্দি ডাবড এনিমে দেখতে **Crunchyroll (India)** অথবা ইউটিউবে **Muse India** চ্যানেল ভিজিট করতে পারেন।
-                </p>
-              </div>
-            </div>
-
-            {/* Episode Grid Selector */}
-            <div className="bg-[#111118] border border-white/[0.06] p-6 rounded-[24px]">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base font-extrabold text-white flex items-center gap-2">
-                  <Tv2 className="w-5 h-5 text-[#8B5CF6]" />
-                  Select Episode
-                </h3>
-                <span className="text-xs text-[#777] font-semibold">Total: {totalEpisodes} episodes</span>
-              </div>
-              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
-                {Array.from({ length: totalEpisodes }, (_, i) => i + 1).map((episodeNum) => (
-                  <Link
-                    key={episodeNum}
-                    href={`/anime/${anime.id}?ep=${episodeNum}&server=${server}&lang=${lang === 'hindi' ? 'sub' : lang}`}
-                    className={`py-2.5 text-center text-xs font-black rounded-xl border transition-all duration-300 ${
-                      ep === episodeNum
-                        ? 'bg-[#8B5CF6] border-[#8B5CF6] text-white shadow-[0_0_12px_rgba(139,92,246,0.4)] scale-95'
-                        : 'bg-[#0e0e14] border-white/[0.04] text-[#999] hover:text-white hover:border-[#8B5CF6]/30'
-                    }`}
-                  >
-                    {episodeNum}
-                  </Link>
-                ))}
+              {/* Episode Grid Selector */}
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                    <Tv2 className="w-5 h-5 text-[#8B5CF6]" />
+                    Select Episode
+                  </h3>
+                  <span className="text-xs text-[#777] font-semibold">Total: {totalEpisodes} episodes</span>
+                </div>
+                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 max-h-[220px] overflow-y-auto pr-2 custom-scrollbar">
+                  {Array.from({ length: totalEpisodes }, (_, i) => i + 1).map((episodeNum) => (
+                    <Link
+                      key={episodeNum}
+                      href={`/anime/${anime.id}?ep=${episodeNum}`}
+                      className={`py-2.5 text-center text-xs font-black rounded-xl border transition-all duration-300 ${
+                        ep === episodeNum
+                          ? 'bg-[#8B5CF6] border-[#8B5CF6] text-white shadow-[0_0_12px_rgba(139,92,246,0.4)] scale-95'
+                          : 'bg-[#0e0e14] border-white/[0.04] text-[#999] hover:text-white hover:border-[#8B5CF6]/30'
+                      }`}
+                    >
+                      {episodeNum}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
 

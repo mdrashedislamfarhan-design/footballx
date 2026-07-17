@@ -106,3 +106,51 @@ body {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(139, 92, 246, 0.5);
 }
+
+/* ─── Cross-Device & Smart TV Optimizations ──────────────────────────────────── */
+
+/* Smooth scrolling across all devices */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* D-Pad / Remote Control navigation — prominent focus rings for Smart TVs */
+*:focus-visible {
+  outline: 3px solid #8B5CF6 !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.55) !important;
+  border-radius: 8px;
+}
+
+/* Tap highlight removal on mobile/tablet */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smart TV Full HD (1920x1080) — larger base font for 10-foot readability */
+@media (min-width: 1920px) {
+  body { font-size: 18px; }
+}
+
+/* Smart TV 4K (2560px+) */
+@media (min-width: 2560px) {
+  body { font-size: 20px; }
+}
+
+/* Ensure iframes fill properly on all screens */
+iframe {
+  border: none;
+  display: block;
+  max-width: 100%;
+}
+
+/* PWA: Prevent overscroll bounce on iOS when installed as app */
+@media all and (display-mode: standalone) {
+  body {
+    overscroll-behavior-y: none;
+  }
+}

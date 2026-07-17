@@ -194,6 +194,20 @@ export async function fetchUpcoming(perPage = 10): Promise<AnimeMedia[]> {
   return data.Page.media;
 }
 
+// ── Anime Movies ───────────────────────────────────────────────────────────
+export async function fetchMovies(page = 1, perPage = 20): Promise<AnimeMedia[]> {
+  const data = await gql(`
+    query ($page: Int, $perPage: Int) {
+      Page(page: $page, perPage: $perPage) {
+        media(type: ANIME, format: MOVIE, sort: POPULARITY_DESC) {
+          ${MEDIA_FIELDS}
+        }
+      }
+    }
+  `, { page, perPage });
+  return data.Page.media;
+}
+
 // ── Helper ─────────────────────────────────────────────────────────────────
 export function getTitle(anime: AnimeMedia) {
   return anime.title.english || anime.title.romaji;

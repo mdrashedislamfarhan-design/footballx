@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { Tv2 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'About AniStream',
-  description: 'Learn about AniStream — the premium anime streaming platform built for passionate anime fans worldwide.',
+  title: 'About AniStreamBD',
+  description: 'Learn about AniStreamBD — the premium anime streaming platform built for passionate anime fans worldwide.',
 };
 
 export default function AboutPage() {
@@ -20,8 +20,8 @@ export default function AboutPage() {
               <Tv2 className="w-6 h-6 text-white" />
             </div>
             <span className="text-3xl font-black">
-              <span className="text-white">Ani</span>
-              <span className="bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] bg-clip-text text-transparent">Stream</span>
+              <span className="text-white">AniStream</span>
+              <span className="bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] bg-clip-text text-transparent">BD</span>
             </span>
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-4">
@@ -51,7 +51,7 @@ export default function AboutPage() {
         <div className="bg-gradient-to-r from-[#8B5CF6]/10 to-[#EC4899]/5 border border-[#8B5CF6]/20 rounded-[24px] p-8 mb-12">
           <h2 className="text-xl font-extrabold text-white mb-3">Our Mission</h2>
           <p className="text-[#B3B3B3] leading-relaxed">
-            We believe anime is more than entertainment — it is art, culture, and community. AniStream exists to give every fan the best possible way to enjoy anime, with beautiful design, fast streaming, and a library that spans every genre. Powered by AniList data and built for the next generation of anime fans.
+            We believe anime is more than entertainment — it is art, culture, and community. AniStreamBD exists to give every fan the best possible way to enjoy anime, with beautiful design, fast streaming, and a library that spans every genre. Powered by AniList data and built for the next generation of anime fans.
           </p>
         </div>
 

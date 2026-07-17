@@ -27,7 +27,7 @@ export default function SettingsPage() {
           </div>
           <div>
             <h1 className="text-2xl font-black text-white">Settings</h1>
-            <p className="text-xs text-[#555] mt-0.5">Manage your AniStream preferences</p>
+            <p className="text-xs text-[#555] mt-0.5">Manage your AniStreamBD preferences</p>
           </div>
         </div>
 
@@ -137,7 +137,7 @@ export default function SettingsPage() {
           </div>
 
           <div className="text-center text-xs text-[#333] font-semibold py-2">
-            AniStream v1.0.0 • Made with ♥ for anime fans
+            AniStreamBD v1.0.0 • Made with ♥ for anime fans
           </div>
         </div>
       </div>

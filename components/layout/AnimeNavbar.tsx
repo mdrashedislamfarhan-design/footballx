@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Search, Menu, X, Tv2, Flame, Star, BookOpen, Home, User, LogOut, Settings, ChevronDown } from 'lucide-react';
+import { Search, Menu, X, Tv2, Flame, Star, BookOpen, Home, User, LogOut, Settings, ChevronDown, Film } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { logout } from '@/services/firebase/auth';
 
@@ -10,7 +10,8 @@ const NAV_LINKS = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/trending', label: 'Trending', icon: Flame },
   { href: '/popular', label: 'Popular', icon: Star },
-  { href: '/browse', label: 'Browse', icon: BookOpen },
+  { href: '/browse', label: 'Anime', icon: Tv2 },
+  { href: '/movies', label: 'Movies', icon: Film },
 ];
 
 export default function AnimeNavbar() {
@@ -18,10 +19,22 @@ export default function AnimeNavbar() {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState('');
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [avatar, setAvatar] = useState<string | null>(null);
   const pathname = usePathname();
   const router = useRouter();
   const { user, loading } = useAuth();
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setAvatar(localStorage.getItem('user-avatar'));
+      const handleAvatar = () => {
+        setAvatar(localStorage.getItem('user-avatar'));
+      };
+      window.addEventListener('avatar-changed', handleAvatar);
+      return () => window.removeEventListener('avatar-changed', handleAvatar);
+    }
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -61,13 +74,15 @@ export default function AnimeNavbar() {
     }`}>
       <div className="max-w-[1440px] mx-auto px-4 md:px-8 h-16 flex items-center gap-6">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] flex items-center justify-center shadow-[0_0_15px_rgba(139,92,246,0.4)]">
-            <Tv2 className="w-4 h-4 text-white" />
-          </div>
-          <span className="text-lg font-black tracking-tight">
-            <span className="text-white">Ani</span>
-            <span className="bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] bg-clip-text text-transparent">Stream</span>
+        <Link href="/" className="flex items-center gap-2 shrink-0 min-w-0">
+          <img
+            src="/icon.png"
+            alt="AniStreamBD"
+            className="w-8 h-8 rounded-xl object-cover shadow-[0_0_15px_rgba(139,92,246,0.4)] shrink-0"
+          />
+          <span className="text-lg font-black tracking-tight whitespace-nowrap">
+            <span className="text-white">AniStream</span>
+            <span className="bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] bg-clip-text text-transparent">BD</span>
           </span>
         </Link>
 
@@ -94,7 +109,7 @@ export default function AnimeNavbar() {
           <input
             value={q}
             onChange={e => setQ(e.target.value)}
-            placeholder="Search anime..."
+            placeholder="Search anime, movies..."
             className="w-full pl-10 pr-4 py-2.5 bg-white/[0.06] border border-white/[0.08] focus:border-[#8B5CF6] rounded-xl text-sm text-white placeholder-[#555] outline-none transition-colors"
           />
         </form>
@@ -108,9 +123,17 @@ export default function AnimeNavbar() {
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.05] border border-white/[0.08] hover:border-[#8B5CF6]/40 hover:bg-white/[0.08] transition-all"
                 >
-                  <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] flex items-center justify-center text-white font-black text-xs">
-                    {user.displayName ? user.displayName[0].toUpperCase() : user.email?.[0]?.toUpperCase() || 'U'}
-                  </div>
+                  {avatar ? (
+                    <img
+                      src={avatar}
+                      alt={user.displayName || 'Avatar'}
+                      className="w-7 h-7 rounded-full object-cover border border-[#8B5CF6]/30"
+                    />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] flex items-center justify-center text-white font-black text-xs shrink-0">
+                      {user.displayName ? user.displayName[0].toUpperCase() : user.email?.[0]?.toUpperCase() || 'U'}
+                    </div>
+                  )}
                   <span className="text-sm font-semibold text-white max-w-[100px] truncate">
                     {user.displayName || user.email?.split('@')[0]}
                   </span>
@@ -165,7 +188,7 @@ export default function AnimeNavbar() {
             <input
               value={q}
               onChange={e => setQ(e.target.value)}
-              placeholder="Search anime..."
+              placeholder="Search anime, movies..."
               className="w-full pl-10 pr-4 py-3 bg-white/[0.06] border border-white/[0.08] rounded-xl text-sm text-white placeholder-[#555] outline-none"
             />
           </form>
@@ -183,7 +206,12 @@ export default function AnimeNavbar() {
               <>
                 <Link href="/profile" onClick={() => setOpen(false)}
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-[#ccc] hover:text-white">
-                  <User className="w-4 h-4 text-[#8B5CF6]" /> Profile
+                  {avatar ? (
+                    <img src={avatar} alt="" className="w-5 h-5 rounded-full object-cover border border-[#8B5CF6]/30" />
+                  ) : (
+                    <User className="w-4 h-4 text-[#8B5CF6]" />
+                  )}
+                  Profile
                 </Link>
                 <button onClick={() => { handleLogout(); setOpen(false); }}
                   className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-[#FF5252]">

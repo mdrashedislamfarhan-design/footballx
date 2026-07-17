@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Tv2, Heart } from 'lucide-react';
+import { Heart, Sparkles } from 'lucide-react';
+import PwaInstallButton from '../ui/PwaInstallButton';
 
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -26,13 +27,21 @@ const footerLinks = {
     { label: 'Home', href: '/' },
     { label: 'Trending', href: '/trending' },
     { label: 'Popular', href: '/popular' },
-    { label: 'Browse', href: '/browse' },
+    { label: 'Browse Anime', href: '/browse' },
+    { label: 'Movies', href: '/movies' },
   ],
-  Genres: [
+  Anime: [
+    { label: 'Trending Anime', href: '/trending' },
+    { label: 'Top Rated', href: '/browse?sort=SCORE_DESC' },
     { label: 'Action', href: '/browse?genre=Action' },
     { label: 'Romance', href: '/browse?genre=Romance' },
     { label: 'Fantasy', href: '/browse?genre=Fantasy' },
-    { label: 'Sci-Fi', href: '/browse?genre=Sci-Fi' },
+  ],
+  Movies: [
+    { label: 'Hollywood', href: '/movies?type=hollywood' },
+    { label: 'Bollywood', href: '/movies?type=bollywood' },
+    { label: 'Web Series', href: '/movies' },
+    { label: 'Search', href: '/search' },
   ],
   Account: [
     { label: 'Sign In', href: '/login' },
@@ -52,21 +61,29 @@ export default function AnimeFooter() {
   return (
     <footer className="border-t border-white/[0.05] bg-[#0a0a0f] mt-20">
       <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-16">
-        {/* Top */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 pb-12 border-b border-white/[0.05]">
+
+        {/* ── Install Banner — centered above all columns ── */}
+        <div className="flex justify-center mb-10">
+          <PwaInstallButton />
+        </div>
+
+        {/* Top — Brand + Links */}
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 pb-12 border-b border-white/[0.05]">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1 space-y-4">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] flex items-center justify-center shadow-[0_0_15px_rgba(139,92,246,0.3)]">
-                <Tv2 className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-base font-black">
-                <span className="text-white">Ani</span>
-                <span className="bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] bg-clip-text text-transparent">Stream</span>
+              <img
+                src="/icon.png"
+                alt="AniStreamBD"
+                className="w-8 h-8 rounded-xl object-cover shadow-[0_0_15px_rgba(139,92,246,0.3)] shrink-0"
+              />
+              <span className="text-base font-black whitespace-nowrap">
+                <span className="text-white">AniStream</span>
+                <span className="bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] bg-clip-text text-transparent">BD</span>
               </span>
             </Link>
             <p className="text-xs text-[#555] leading-relaxed max-w-[200px]">
-              Your premium destination for streaming anime. Sub & Dub available.
+              Stream anime, Bollywood &amp; Hollywood movies and web series — all in one place. Sub, Dub &amp; Hindi available.
             </p>
             <div className="flex items-center gap-3">
               {[
@@ -100,12 +117,15 @@ export default function AnimeFooter() {
 
         {/* Bottom */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8">
-          <p className="text-[11px] text-[#444]">
-            Data provided by{' '}
+          <p className="text-[11px] text-[#444] leading-relaxed">
+            Anime data by{' '}
             <a href="https://anilist.co" target="_blank" rel="noopener" className="text-[#8B5CF6] hover:underline">AniList</a>.
-            {' '}For educational purposes only. All rights belong to their respective owners.
+            {' '}Movie data by{' '}
+            <a href="https://www.themoviedb.org" target="_blank" rel="noopener" className="text-[#EC4899] hover:underline">TMDB</a>.
+            {' '}AniStreamBD — Your ultimate destination for free anime &amp; movie streaming.
           </p>
-          <p className="text-[11px] text-[#444] flex items-center gap-1 shrink-0">
+          <p className="text-[11px] text-[#444] flex items-center gap-1.5 shrink-0">
+            <Sparkles className="w-3 h-3 text-[#8B5CF6]" />
             Made with <Heart className="w-3 h-3 text-[#EC4899] fill-[#EC4899]" /> for anime fans
           </p>
         </div>

@@ -41,7 +41,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-[#0a0a0f] relative overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center pt-24 pb-12 px-4 bg-[#0a0a0f] relative overflow-hidden">
       <div className="absolute top-1/4 right-1/3 w-[500px] h-[500px] bg-[#EC4899]/8 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 left-1/3 w-[400px] h-[400px] bg-[#8B5CF6]/10 rounded-full blur-[100px] pointer-events-none" />
 
@@ -49,12 +49,14 @@ export default function RegisterPage() {
         {/* Logo */}
         <div className="text-center mb-10">
           <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] flex items-center justify-center shadow-[0_0_20px_rgba(139,92,246,0.4)]">
-              <Tv2 className="w-5 h-5 text-white" />
-            </div>
+            <img
+              src="/icon.png"
+              alt="AniStreamBD"
+              className="w-10 h-10 rounded-xl object-cover shadow-[0_0_20px_rgba(139,92,246,0.4)]"
+            />
             <span className="text-2xl font-black">
-              <span className="text-white">Ani</span>
-              <span className="bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] bg-clip-text text-transparent">Stream</span>
+              <span className="text-white">AniStream</span>
+              <span className="bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] bg-clip-text text-transparent">BD</span>
             </span>
           </Link>
           <h1 className="text-2xl font-black text-white">Create your account</h1>

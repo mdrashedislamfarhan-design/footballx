@@ -8,13 +8,13 @@ import { AuthProvider } from '@/contexts/AuthContext';
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
 
 export const metadata: Metadata = {
-  title: { default: 'AniStream — Watch Anime Free Online', template: '%s | AniStream' },
+  title: { default: 'AniStreamBD — Watch Anime Free Online', template: '%s | AniStreamBD' },
   description: 'Watch your favorite anime free online in HD. Trending, popular, seasonal — all in one place.',
   keywords: ['anime', 'watch anime', 'free anime', 'anime streaming', 'anime online'],
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    siteName: 'AniStream',
+    siteName: 'AniStreamBD',
   },
 };
 
