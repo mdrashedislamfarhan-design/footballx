@@ -2,6 +2,7 @@ import { fetchAnimeDetail, getTitle } from '@/services/anime/anilist';
 import { findTmdbTvIdByTitle } from '@/services/movies/tmdb';
 import AnimeCard from '@/components/anime/AnimeCard';
 import MultiServerPlayer, { ServerConfig } from '@/components/player/MultiServerPlayer';
+import WatchTracker from '@/components/player/WatchTracker';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Star, ChevronLeft, ChevronRight, Tv2, Info, Sparkles } from 'lucide-react';
@@ -102,6 +103,16 @@ export default async function AnimeDetailPage({
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white">
+      {/* Automatic Watch Tracker */}
+      <WatchTracker
+        id={`anime-${anime.id}`}
+        title={title}
+        coverImage={anime.coverImage.extraLarge || anime.coverImage.large || anime.bannerImage || ''}
+        url={`/anime/${anime.id}?ep=${ep}`}
+        episode={ep}
+        mediaType="anime"
+      />
+
       {/* Banner Backdrop */}
       <div className="relative h-[35vh] w-full overflow-hidden">
         {anime.bannerImage ? (

@@ -6,6 +6,8 @@ import HeroCarousel from '@/components/anime/HeroCarousel';
 import Link from 'next/link';
 import { Flame, Star, TrendingUp, ChevronRight, Sparkles, Film, Clapperboard } from 'lucide-react';
 
+import ContinueWatching from '@/components/home/ContinueWatching';
+
 export const revalidate = 300;
 
 function SectionHeader({ title, icon: Icon, href, iconColor = '#8B5CF6' }: { title: string; icon: any; href: string; iconColor?: string }) {
@@ -39,6 +41,11 @@ export default async function HomePage() {
       {heroAnimes.length > 0 && <HeroCarousel animes={heroAnimes} />}
 
       <div className="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 pb-20">
+        
+        {/* ── Continue Watching (Resume Episode) ───────────────────────── */}
+        <section className="mt-10">
+          <ContinueWatching />
+        </section>
 
         {/* ── Trending Now ─────────────────────────────────────────────── */}
         <section className="mt-16">

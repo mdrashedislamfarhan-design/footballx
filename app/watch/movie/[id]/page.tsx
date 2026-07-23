@@ -4,6 +4,7 @@ import MultiServerPlayer, { ServerConfig } from '@/components/player/MultiServer
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Star, Clock, ChevronLeft, ChevronRight, Info, Sparkles } from 'lucide-react';
+import WatchTracker from '@/components/player/WatchTracker';
 
 export const revalidate = 3600;
 

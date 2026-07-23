@@ -1,72 +1,97 @@
 import {
-  fetchMovies,
   fetchNowPlaying,
   fetchTopRatedMovies,
-  fetchNewReleases,
   fetchHollywoodMovies,
-  fetchHollywoodSeries,
   fetchBollywoodMovies,
-  fetchBollywoodSeries,
+  fetchLatest2026Movies,
+  fetchSouthHindiDubbed,
+  fetchAnimeMovies,
+  fetchOttWebSeries,
 } from '@/services/movies/tmdb';
 import MovieHeroCarousel from '@/components/movies/MovieHeroCarousel';
-import MovieRow from '@/components/movies/MovieRow';
-import { Film } from 'lucide-react';
-import Link from 'next/link';
+import MoviesExplorer from '@/components/movies/MoviesExplorer';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Movies & Series — AniStreamBD',
-  description: 'Stream your favorite Hollywood and Bollywood movies & web series in HD on AniStreamBD.',
+  title: 'Movies & Web Series — AniStreamBD',
+  description: 'Stream Netflix, HBO, Amazon Prime, Disney+, ZEE5 Web Series & Blockbuster Movies on AniStreamBD.',
 };
 
 export const revalidate = 3600; // Cache 1 hour
 
-export default async function MoviesPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ type?: 'hollywood' | 'bollywood'; section?: string }>;
-}) {
-  const resolvedSearchParams = await searchParams;
-  const currentTab = resolvedSearchParams.type || 'hollywood';
-
+export default async function MoviesPage() {
   let heroMovies: any[] = [];
-  let rowSections: { title: string; movies: any[] }[] = [];
+  let netflix: any[] = [];
+  let hbo: any[] = [];
+  let amazon: any[] = [];
+  let disney: any[] = [];
+  let zee5: any[] = [];
+  let latest2026: any[] = [];
+  let southHindi: any[] = [];
+  let animeFeatures: any[] = [];
+  let hollywoodMovies: any[] = [];
+  let bollywoodMovies: any[] = [];
+  let nowPlaying: any[] = [];
+  let topRated: any[] = [];
 
   const apiKeySet = !!(process.env.TMDB_API_KEY || process.env.TMDB_READ_ACCESS_TOKEN);
 
   if (apiKeySet) {
-    if (currentTab === 'bollywood') {
-      const [newReleases, popularMovies, popularSeries] = await Promise.all([
-        fetchNewReleases('bollywood'),
-        fetchBollywoodMovies(),
-        fetchBollywoodSeries(),
-      ]);
+    const [
+      netflixData,
+      hboData,
+      amazonData,
+      disneyData,
+      zee5Data,
+      latestMv,
+      nowPl,
+      southMv,
+      animeMv,
+      hlMov,
+      blMov,
+      topMv,
+    ] = await Promise.all([
+      fetchOttWebSeries('netflix'),
+      fetchOttWebSeries('hbo'),
+      fetchOttWebSeries('amazon'),
+      fetchOttWebSeries('disney'),
+      fetchOttWebSeries('zee5'),
+      fetchLatest2026Movies(),
+      fetchNowPlaying(),
+      fetchSouthHindiDubbed(),
+      fetchAnimeMovies(),
+      fetchHollywoodMovies(),
+      fetchBollywoodMovies(),
+      fetchTopRatedMovies(),
+    ]);
 
-      heroMovies = newReleases.slice(0, 5);
+    netflix = netflixData;
+    hbo = hboData;
+    amazon = amazonData;
+    disney = disneyData;
+    zee5 = zee5Data;
+    latest2026 = latestMv;
+    nowPlaying = nowPl;
+    southHindi = southMv;
+    animeFeatures = animeMv;
+    hollywoodMovies = hlMov;
+    bollywoodMovies = blMov;
+    topRated = topMv;
 
-      rowSections = [
-        { title: '🔥 New Releases (Indian)', movies: newReleases },
-        { title: '📺 Popular Indian Web Series', movies: popularSeries },
-        { title: '🎬 Blockbuster Bollywood Movies', movies: popularMovies },
-      ];
-    } else {
-      const [newReleases, nowPlaying, popularMovies, popularSeries, topRated] = await Promise.all([
-        fetchNewReleases('hollywood'),
-        fetchNowPlaying(),
-        fetchHollywoodMovies(),
-        fetchHollywoodSeries(),
-        fetchTopRatedMovies(),
-      ]);
-
-      heroMovies = newReleases.slice(0, 5);
-
-      rowSections = [
-        { title: '🍿 Now Playing in Cinemas', movies: nowPlaying },
-        { title: '📺 Popular Hollywood Web Series', movies: popularSeries },
-        { title: '🎬 Trending Hollywood Movies', movies: popularMovies },
-        { title: '⭐ Top Rated Movies', movies: topRated },
-      ];
-    }
+    // Hero Banner: ONLY Movies (not web series), picked from latest + now playing + top rated
+    const movieOnlyPool = [
+      ...latest2026.filter((m: any) => m.mediaType !== 'series' && m.bannerImage),
+      ...nowPlaying.filter((m: any) => m.bannerImage),
+      ...hollywoodMovies.filter((m: any) => m.bannerImage),
+      ...topRated.filter((m: any) => m.bannerImage),
+    ];
+    // Deduplicate
+    const seenIds = new Set<string>();
+    heroMovies = movieOnlyPool.filter((m: any) => {
+      if (seenIds.has(m.id)) return false;
+      seenIds.add(m.id);
+      return true;
+    }).slice(0, 6);
   }
 
   return (
@@ -75,52 +100,35 @@ export default async function MoviesPage({
       {heroMovies.length > 0 && <MovieHeroCarousel movies={heroMovies} />}
 
       {/* Main Content Area */}
-      <div className="mt-10 space-y-12">
-        {/* Tab Header & Selector */}
-        <div className="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-xl md:text-2xl font-black text-white flex items-center gap-2">
-              <Film className="w-5 h-5 text-[#8B5CF6]" />
-              {currentTab === 'hollywood' ? 'Hollywood Movies & Series' : 'Indian Movies & Series'}
-            </h1>
-          </div>
-          <div className="flex items-center gap-1.5 bg-[#111118] p-1.5 rounded-2xl border border-white/[0.04] self-start sm:self-auto">
-            {[
-              { id: 'hollywood', name: '🎥 Hollywood' },
-              { id: 'bollywood', name: '🌟 Bollywood' },
-            ].map((tab) => (
-              <Link
-                key={tab.id}
-                href={`/movies?type=${tab.id}`}
-                className={`px-5 py-2.5 rounded-xl text-xs font-black transition-all duration-300 ${
-                  currentTab === tab.id
-                    ? 'bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] text-white shadow-[0_0_15px_rgba(139,92,246,0.3)]'
-                    : 'text-[#999] hover:text-white hover:bg-white/[0.03]'
-                }`}
-              >
-                {tab.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        {/* Warning if no key */}
+      <div className="mt-8 max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 space-y-8">
+        {/* Warning if no TMDB API key */}
         {!apiKeySet && (
-          <div className="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12">
-            <div className="p-5 rounded-[20px] bg-[#F59E0B]/10 border border-[#F59E0B]/30 text-[#FCD34D] text-sm font-semibold">
-              <p className="font-black mb-1">⚠️ TMDB API Key Missing</p>
-              <p className="text-xs text-[#F59E0B]/80 leading-relaxed">
-                Movie data requires a free TMDB API key. Add <code className="bg-black/30 px-1 py-0.5 rounded text-white">TMDB_API_KEY=your_key</code> to your <code className="bg-black/30 px-1 py-0.5 rounded text-white">.env.local</code> file.
-                Get your free key at <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener" className="underline text-[#FCD34D]">themoviedb.org</a>.
-              </p>
-            </div>
+          <div className="p-5 rounded-[20px] bg-[#F59E0B]/10 border border-[#F59E0B]/30 text-[#FCD34D] text-sm font-semibold">
+            <p className="font-black mb-1">⚠️ TMDB API Key Missing</p>
+            <p className="text-xs text-[#F59E0B]/80 leading-relaxed">
+              Movie data requires a free TMDB API key. Add <code className="bg-black/30 px-1 py-0.5 rounded text-white">TMDB_API_KEY=your_key</code> to your <code className="bg-black/30 px-1 py-0.5 rounded text-white">.env.local</code> file.
+              Get your free key at <a href="https://www.themoviedb.org/settings/api" target="_blank" rel="noopener" className="underline text-[#FCD34D]">themoviedb.org</a>.
+            </p>
           </div>
         )}
 
-        {/* Netflix-style Slider Rows */}
-        {apiKeySet && rowSections.map((sec) => (
-          <MovieRow key={sec.title} title={sec.title} movies={sec.movies} />
-        ))}
+        {/* Movies Explorer Component (Search, OTT Filters, Rows/Grid View) */}
+        {apiKeySet && (
+          <MoviesExplorer
+            netflixSeries={netflix}
+            hboSeries={hbo}
+            amazonSeries={amazon}
+            disneySeries={disney}
+            zee5Series={zee5}
+            latest2026Movies={latest2026}
+            nowPlayingMovies={nowPlaying}
+            southHindiMovies={southHindi}
+            animeFeatureMovies={animeFeatures}
+            initialHollywoodMovies={hollywoodMovies}
+            initialBollywoodMovies={bollywoodMovies}
+            topRatedMovies={topRated}
+          />
+        )}
       </div>
     </div>
   );

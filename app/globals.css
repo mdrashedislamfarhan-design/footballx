@@ -1,15 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #00E676;
-  --color-primary-hover: #00C853;
-  --color-primary-dark: #009624;
-  --color-bg: #050505;
-  --color-bg-secondary: #101010;
-  --color-card: #181818;
+  --color-primary: #8B5CF6;
+  --color-primary-hover: #7C3AED;
+  --color-primary-dark: #6D28D9;
+  --color-secondary: #EC4899;
+  --color-bg: #0a0a0f;
+  --color-bg-secondary: #111118;
+  --color-card: #14141e;
   --color-text-primary: #FFFFFF;
-  --color-text-secondary: #B3B3B3;
-  --color-text-muted: #777777;
+  --color-text-secondary: #A78BFA;
+  --color-text-muted: #666666;
   
   --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
   
@@ -18,40 +19,42 @@
 }
 
 :root {
-  --background: #050505;
+  --background: #0a0a0f;
   --foreground: #ffffff;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  overflow-x: hidden;
 }
 
 /* Glassmorphism custom styling utilities */
 .glass-nav {
-  background-color: rgba(16, 16, 16, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background-color: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(17, 17, 24, 0.7);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-button {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(139, 92, 246, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(139, 92, 246, 0.25);
 }
 
-/* Premium Card System */
+/* Premium Glowing Card System */
 .card-premium {
   position: relative;
-  background: #181818;
+  background: #111118;
   border-radius: 20px;
 }
 .card-premium::before {
@@ -60,7 +63,7 @@ body {
   inset: 0;
   border-radius: 20px;
   padding: 1.5px;
-  background: linear-gradient(135deg, rgba(0, 230, 118, 0.2), rgba(255, 255, 255, 0.03));
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(236, 72, 153, 0.1));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -68,12 +71,24 @@ body {
 }
 
 .card-premium-glow:hover {
-  box-shadow: 0 0 30px rgba(0, 230, 118, 0.15);
+  box-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
 }
 
-/* Custom premium transitions */
+/* Custom premium transitions & GPU Acceleration */
 .transition-all-300 {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform, opacity;
+}
+
+/* Force hardware accelerated image rendering */
+img {
+  content-visibility: auto;
 }
 
 /* Custom horizontal scrollbar hiding */
@@ -91,8 +106,9 @@ body {
   margin-bottom: 96px;
 }
 
-/* Custom Scrollbar for Episode Selector */
+/* Custom Scrollbar for Episode / Movie Selector */
 .custom-scrollbar::-webkit-scrollbar {
+  height: 6px;
   width: 6px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -104,7 +120,7 @@ body {
   border-radius: 8px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(139, 92, 246, 0.5);
+  background: rgba(139, 92, 246, 0.6);
 }
 
 /* ─── Cross-Device & Smart TV Optimizations ──────────────────────────────────── */

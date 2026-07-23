@@ -59,16 +59,54 @@ const MEDIA_FIELDS = `
   tags { name rank }
 `;
 
+const aniListMemoryCache = new Map<string, { data: any; expiry: number }>();
+const ANILIST_CACHE_TTL_MS = 15 * 60 * 1000; // 15 minutes TTL
+
 async function gql(query: string, variables?: Record<string, unknown>) {
-  const res = await fetch(ANILIST_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify({ query, variables }),
-    next: { revalidate: 300 }, // cache 5 minutes
-  });
-  const json = await res.json();
-  if (json.errors) throw new Error(json.errors[0].message);
-  return json.data;
+  const cacheKey = JSON.stringify({ query, variables });
+  const now = Date.now();
+
+  if (aniListMemoryCache.has(cacheKey)) {
+    const cached = aniListMemoryCache.get(cacheKey)!;
+    if (now < cached.expiry) {
+      return cached.data;
+    }
+  }
+
+  try {
+    const res = await fetch(ANILIST_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ query, variables }),
+      next: { revalidate: 900 },
+    });
+
+    if (!res.ok) {
+      console.warn(`AniList GraphQL status ${res.status}`);
+      if (aniListMemoryCache.has(cacheKey)) {
+        return aniListMemoryCache.get(cacheKey)!.data;
+      }
+      return { Page: { media: [] } };
+    }
+
+    const json = await res.json();
+    if (json.errors) {
+      console.warn('AniList GraphQL error:', json.errors[0]?.message);
+      if (aniListMemoryCache.has(cacheKey)) {
+        return aniListMemoryCache.get(cacheKey)!.data;
+      }
+      return { Page: { media: [] } };
+    }
+
+    aniListMemoryCache.set(cacheKey, { data: json.data, expiry: now + ANILIST_CACHE_TTL_MS });
+    return json.data;
+  } catch (err) {
+    console.error('AniList GraphQL fetch error:', err);
+    if (aniListMemoryCache.has(cacheKey)) {
+      return aniListMemoryCache.get(cacheKey)!.data;
+    }
+    return { Page: { media: [] } };
+  }
 }
 
 // ── Trending Now (currently airing + most popular) ────────────────────────
