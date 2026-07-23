@@ -115,12 +115,25 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
   return (
     <div className={`w-full space-y-0 ${theaterMode ? 'relative z-50' : ''}`}>
       
-      {/* ── Theater Mode Dimmed Overlay ─────────────────── */}
+      {/* ── Theater Mode Dimmed Overlay & Floating Exit Button ───── */}
       {theaterMode && (
-        <div
-          onClick={() => setTheaterMode(false)}
-          className="fixed inset-0 z-40 bg-black/95 backdrop-blur-md transition-opacity duration-300 animate-fadeIn"
-        />
+        <>
+          <div
+            onClick={() => setTheaterMode(false)}
+            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-md transition-opacity duration-300 animate-fadeIn cursor-pointer"
+            title="Click outside to exit theater mode"
+          />
+          {/* Always visible Floating Exit Button on Top-Right */}
+          <div className="fixed top-5 right-6 z-[60] flex items-center gap-3">
+            <button
+              onClick={() => setTheaterMode(false)}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#FF5252] to-[#EF4444] text-white text-xs font-black rounded-xl shadow-[0_0_25px_rgba(255,82,82,0.7)] hover:scale-105 transition-all border border-white/20"
+            >
+              <X className="w-4 h-4" />
+              <span>Exit Theater (Esc)</span>
+            </button>
+          </div>
+        </>
       )}
 
       {/* ── Player Wrapper (100% Clean Video Frame — ZERO Text Inside Video) ── */}
