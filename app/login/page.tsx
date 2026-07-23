@@ -51,9 +51,9 @@ export default function LoginPage() {
         <div className="text-center mb-10">
           <Link href="/" className="inline-flex items-center gap-2 mb-4">
             <img
-              src="/icon.png"
+              src="/logo_img.png?v=2"
               alt="AniStreamBD"
-              className="w-10 h-10 rounded-xl object-cover shadow-[0_0_20px_rgba(139,92,246,0.4)]"
+              className="w-11 h-11 rounded-xl object-cover shadow-[0_0_20px_rgba(139,92,246,0.5)] border border-white/10"
             />
             <span className="text-2xl font-black">
               <span className="text-white">AniStream</span>

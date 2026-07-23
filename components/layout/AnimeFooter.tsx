@@ -73,9 +73,9 @@ export default function AnimeFooter() {
           <div className="col-span-2 md:col-span-1 space-y-4">
             <Link href="/" className="flex items-center gap-2">
               <img
-                src="/icon.png"
+                src="/logo_img.png?v=2"
                 alt="AniStreamBD"
-                className="w-8 h-8 rounded-xl object-cover shadow-[0_0_15px_rgba(139,92,246,0.3)] shrink-0"
+                className="w-9 h-9 rounded-xl object-cover shadow-[0_0_15px_rgba(139,92,246,0.4)] border border-white/10 shrink-0"
               />
               <span className="text-base font-black whitespace-nowrap">
                 <span className="text-white">AniStream</span>

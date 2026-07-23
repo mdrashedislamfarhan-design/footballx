@@ -76,9 +76,9 @@ export default function AnimeNavbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0 min-w-0">
           <img
-            src="/icon.png"
+            src="/logo_img.png?v=2"
             alt="AniStreamBD"
-            className="w-8 h-8 rounded-xl object-cover shadow-[0_0_15px_rgba(139,92,246,0.4)] shrink-0"
+            className="w-9 h-9 rounded-xl object-cover shadow-[0_0_15px_rgba(139,92,246,0.5)] border border-white/10 shrink-0"
           />
           <span className="text-lg font-black tracking-tight whitespace-nowrap">
             <span className="text-white">AniStream</span>
