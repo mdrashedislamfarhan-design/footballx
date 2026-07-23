@@ -3,6 +3,7 @@ import './globals.css';
 import AnimeNavbar from '@/components/layout/AnimeNavbar';
 import AnimeFooter from '@/components/layout/AnimeFooter';
 import { AuthProvider } from '@/contexts/AuthContext';
+import UpdateNotifier from '@/components/ui/UpdateNotifier';
 
 export const metadata: Metadata = {
   title: { default: 'AniStreamBD — Watch Anime & Movies Free Online', template: '%s | AniStreamBD' },
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <AnimeNavbar />
           <main>{children}</main>
           <AnimeFooter />
+          <UpdateNotifier />
         </AuthProvider>
       </body>
     </html>
