@@ -68,6 +68,16 @@ export default async function AnimeDetailPage({
 
   // ── Build the full server list ────────────────────────────────────────
   const servers: ServerConfig[] = [
+    // 🇮🇳 Hindi Dubbed Servers FIRST
+    // animeplay.cfd supports /hin (Hindi) language stream directly
+    { name: 'Hindi Server 1', icon: '🇮🇳', lang: 'HI', url: `https://animeplay.cfd/stream/ani/${anime.id}/${ep}/hin` },
+    { name: 'Hindi Server 2', icon: '🇮🇳', lang: 'HI', url: `https://animeplay.cfd/stream/mal/${streamId}/${ep}/hin` },
+    { name: 'Hindi Server 3', icon: '🇮🇳', lang: 'HI', url: `https://multiembed.mov/?video_id=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}&lang=hi` },
+    { name: 'Hindi Server 4', icon: '🇮🇳', lang: 'HI', url: `https://multiembed.eu.org/?video_id=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}&lang=hi` },
+    { name: 'Hindi Server 5', icon: '🇮🇳', lang: 'HI', url: `https://vidlink.pro/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}?primaryColor=8B5CF6` },
+    { name: 'Hindi Server 6', icon: '🇮🇳', lang: 'HI', url: `https://autoembed.co/tv/tmdb/${resolvedTmdbId}-${tmdbSeason}-${ep}` },
+    { name: 'Hindi Server 7', icon: '🇮🇳', lang: 'HI', url: `https://embed.su/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+
     // 🎌 SUB Servers
     { name: 'Main Server 1',  icon: '🎌', lang: 'SUB', url: `https://animeplay.cfd/stream/ani/${anime.id}/${ep}/sub` },
     { name: 'Main Server 2',  icon: '📺', lang: 'SUB', url: `https://animeplay.cfd/stream/mal/${streamId}/${ep}/sub` },
@@ -80,20 +90,11 @@ export default async function AnimeDetailPage({
     { name: 'Main Server 9',  icon: '☁️', lang: 'SUB', url: `https://anime.uniquestream.net/embed/anime/${streamId}/${ep}` },
     { name: 'Main Server 10', icon: '🌟', lang: 'SUB', url: `https://vidlink.pro/embed/anime/${streamId}/${ep}` },
 
-    // 🇺🇸 DUB Servers
-    { name: 'Main Server 1',  icon: '🎌', lang: 'DUB', url: `https://animeplay.cfd/stream/ani/${anime.id}/${ep}/dub` },
-    { name: 'Main Server 2',  icon: '📺', lang: 'DUB', url: `https://animeplay.cfd/stream/mal/${streamId}/${ep}/dub` },
-    { name: 'Main Server 3',  icon: '🐉', lang: 'DUB', url: `https://gogoanime3.cc/embed/${slugTitle}-dub-episode-${ep}` },
-    { name: 'Main Server 4',  icon: '☁️', lang: 'DUB', url: `https://animeplay.cfd/stream/ani/${anime.id}/${ep}/dub` },
-    { name: 'Main Server 5',  icon: '🔥', lang: 'DUB', url: `https://vidlink.pro/embed/anime/${streamId}/${ep}?dub=true` },
-
-    // 🇮🇳 Hindi Dubbed Servers
-    { name: 'Hindi Server 1', icon: '🇮🇳', lang: 'HI', url: `https://vidsrc.to/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'Hindi Server 2', icon: '🇮🇳', lang: 'HI', url: `https://vidsrc.me/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'Hindi Server 3', icon: '🇮🇳', lang: 'HI', url: `https://vidsrc.pm/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'Hindi Server 4', icon: '🇮🇳', lang: 'HI', url: `https://embed.su/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'Hindi Server 5', icon: '🇮🇳', lang: 'HI', url: `https://vidsrc.xyz/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'Hindi Server 6', icon: '🇮🇳', lang: 'HI', url: `https://vidsrc.rip/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    // 🇺🇸 DUB (English) Servers
+    { name: 'Dub Server 1',   icon: '🎌', lang: 'DUB', url: `https://animeplay.cfd/stream/ani/${anime.id}/${ep}/dub` },
+    { name: 'Dub Server 2',   icon: '📺', lang: 'DUB', url: `https://animeplay.cfd/stream/mal/${streamId}/${ep}/dub` },
+    { name: 'Dub Server 3',   icon: '🐉', lang: 'DUB', url: `https://gogoanime3.cc/embed/${slugTitle}-dub-episode-${ep}` },
+    { name: 'Dub Server 4',   icon: '🔥', lang: 'DUB', url: `https://vidlink.pro/embed/anime/${streamId}/${ep}?dub=true` },
   ];
 
   const totalEpisodes = Math.max(
