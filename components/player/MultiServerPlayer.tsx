@@ -181,25 +181,27 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
             </button>
           </div>
 
-          {/* Server Cards Grid */}
-          <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2.5 max-h-56 overflow-y-auto custom-scrollbar p-1">
+          {/* 5 Flag Cards Per Row Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 p-1">
             {filteredServers.map((srv, idx) => {
               const isPlaying = activeServer?.url === srv.url;
               return (
                 <button
                   key={idx}
                   onClick={() => handleSelectServer(srv)}
-                  className={`group relative flex items-center gap-2.5 p-2.5 rounded-xl border text-xs font-black transition-all hover:scale-105 active:scale-95 ${
+                  className={`group relative flex items-center justify-between p-3 rounded-xl border text-xs font-black transition-all hover:scale-105 active:scale-95 ${
                     isPlaying
-                      ? 'bg-gradient-to-r from-[#4F46E5]/40 to-[#8B5CF6]/40 border-[#8B5CF6] text-white shadow-[0_0_15px_rgba(139,92,246,0.5)]'
-                      : 'bg-white/[0.03] border-white/10 text-white/80 hover:bg-white/[0.08] hover:text-white'
+                      ? 'bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] border-transparent text-white shadow-[0_0_15px_rgba(139,92,246,0.6)]'
+                      : 'bg-white/[0.04] border-white/10 text-white/80 hover:bg-white/[0.08] hover:text-white'
                   }`}
                 >
-                  <CountryFlag code={srv.icon} size={20} />
-                  <span className="truncate max-w-[85px] leading-none">{srv.name}</span>
+                  <div className="flex items-center gap-2.5 truncate">
+                    <CountryFlag code={srv.icon} size={20} />
+                    <span className="truncate max-w-[100px]">{srv.name}</span>
+                  </div>
 
                   {isPlaying && (
-                    <div className="ml-auto w-3.5 h-3.5 rounded-full bg-[#8B5CF6] text-white flex items-center justify-center text-[8px] font-black shadow-sm">
+                    <div className="w-4 h-4 rounded-full bg-white text-[#8B5CF6] flex items-center justify-center text-[10px] font-black shrink-0 shadow-sm">
                       ✓
                     </div>
                   )}
