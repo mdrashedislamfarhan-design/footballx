@@ -91,34 +91,60 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
         </>
       )}
 
+      {/* ── Top Notice Alert Banner ────────────────────────────────────────────── */}
+      <div className="w-full bg-[#FF2A4B] text-white text-xs font-bold px-4 py-2 flex items-center justify-between shadow-lg rounded-t-2xl">
+        <span className="flex items-center gap-2">
+          <span>🔔</span>
+          <span>Please switch to other servers if default server doesn&apos;t work.</span>
+        </span>
+        <button
+          onClick={() => setModalOpen(true)}
+          className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-white font-black text-[11px] transition-all"
+        >
+          Select Server
+        </button>
+      </div>
+
       {/* ── Main Player Frame ─────────────────────────────────────────────────── */}
       <div className={`relative bg-[#08080f] overflow-hidden ${
         theaterMode
           ? 'fixed top-2 left-1/2 -translate-x-1/2 w-[98vw] max-w-[1700px] h-[88vh] z-50 rounded-[28px]'
-          : 'aspect-video w-full rounded-2xl border border-white/[0.08] shadow-2xl'
+          : 'aspect-video w-full rounded-b-2xl border-x border-b border-white/[0.08] shadow-2xl'
       }`}>
 
-        {/* Currently playing badge */}
-        {activeServer && (
-          <div className="absolute top-3 left-3 z-30 flex items-center gap-2 px-3 py-1.5 bg-black/70 backdrop-blur-md border border-white/10 rounded-xl text-white text-xs font-bold shadow-lg">
-            <CountryFlag code={activeServer.icon} size={16} />
-            <span className="text-white/90">Playing on: <strong className="text-[#8B5CF6]">{activeServer.name}</strong></span>
-          </div>
-        )}
+        {/* Top Control Bar Overlay */}
+        <div className="absolute top-3 inset-x-3 z-30 flex items-center justify-between gap-2 pointer-events-none">
+          {/* Left: Active Server Badge */}
+          {activeServer && (
+            <div className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 bg-black/75 backdrop-blur-md border border-white/10 rounded-xl text-white text-xs font-bold shadow-lg">
+              <CountryFlag code={activeServer.icon} size={16} />
+              <span className="text-white/90">Playing on: <strong className="text-[#8B5CF6]">{activeServer.name}</strong></span>
+            </div>
+          )}
 
-        {/* Theater mode toggle button */}
-        <div className="absolute top-3 right-3 z-30">
-          <button
-            onClick={() => setTheaterMode(t => !t)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all border ${
-              theaterMode
-                ? 'bg-gradient-to-r from-[#EC4899] to-[#8B5CF6] text-white border-transparent'
-                : 'bg-black/70 backdrop-blur-md border-white/10 text-white/80 hover:text-white'
-            }`}
-          >
-            <Clapperboard className="w-3.5 h-3.5" />
-            <span>{theaterMode ? 'Exit Theater' : 'Theater Mode'}</span>
-          </button>
+          {/* Center / Right: Main Purple "Select a server" Button */}
+          <div className="pointer-events-auto flex items-center gap-2">
+            <button
+              onClick={() => setModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#6366F1] via-[#8B5CF6] to-[#EC4899] text-white text-xs font-black rounded-xl shadow-[0_0_20px_rgba(139,92,246,0.6)] hover:scale-105 transition-all border border-white/20 active:scale-95"
+            >
+              <Server className="w-3.5 h-3.5" />
+              <span>Select a server</span>
+            </button>
+
+            {/* Theater mode button */}
+            <button
+              onClick={() => setTheaterMode(t => !t)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black transition-all border ${
+                theaterMode
+                  ? 'bg-gradient-to-r from-[#EC4899] to-[#8B5CF6] text-white border-transparent'
+                  : 'bg-black/75 backdrop-blur-md border-white/10 text-white/80 hover:text-white'
+              }`}
+            >
+              <Clapperboard className="w-3.5 h-3.5" />
+              <span>{theaterMode ? 'Exit' : 'Theater'}</span>
+            </button>
+          </div>
         </div>
 
         {/* ── Video iframe ──────────────────────────────────────────────────── */}
