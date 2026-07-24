@@ -181,27 +181,27 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
             </button>
           </div>
 
-          {/* 5 Flag Cards Per Row Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 p-1">
+          {/* 3 Flag Cards Per Row Grid (Compact & Small Text) */}
+          <div className="grid grid-cols-3 gap-2 p-1">
             {filteredServers.map((srv, idx) => {
               const isPlaying = activeServer?.url === srv.url;
               return (
                 <button
                   key={idx}
                   onClick={() => handleSelectServer(srv)}
-                  className={`group relative flex items-center justify-between p-3 rounded-xl border text-xs font-black transition-all hover:scale-105 active:scale-95 ${
+                  className={`group relative flex items-center justify-between py-2 px-2.5 rounded-xl border text-[11px] font-extrabold transition-all hover:scale-[1.02] active:scale-95 ${
                     isPlaying
-                      ? 'bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] border-transparent text-white shadow-[0_0_15px_rgba(139,92,246,0.6)]'
+                      ? 'bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] border-transparent text-white shadow-[0_0_12px_rgba(139,92,246,0.5)]'
                       : 'bg-white/[0.04] border-white/10 text-white/80 hover:bg-white/[0.08] hover:text-white'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 truncate">
-                    <CountryFlag code={srv.icon} size={20} />
-                    <span className="truncate max-w-[100px]">{srv.name}</span>
+                  <div className="flex items-center gap-2 truncate">
+                    <CountryFlag code={srv.icon} size={16} />
+                    <span className="truncate max-w-[80px] sm:max-w-[100px]">{srv.name}</span>
                   </div>
 
                   {isPlaying && (
-                    <div className="w-4 h-4 rounded-full bg-white text-[#8B5CF6] flex items-center justify-center text-[10px] font-black shrink-0 shadow-sm">
+                    <div className="w-3.5 h-3.5 rounded-full bg-white text-[#8B5CF6] flex items-center justify-center text-[9px] font-black shrink-0 shadow-sm">
                       ✓
                     </div>
                   )}
