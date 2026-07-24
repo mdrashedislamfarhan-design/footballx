@@ -29,14 +29,21 @@ export default async function WatchMoviePage({
   const tmdb = movie.tmdbId;
   const ref  = imdb || String(tmdb);   // fallback to numeric tmdb id
 
-  // ── Build clean list of 100% verified working servers ────────────────────
+  // ── Build clean list of 10 working movie servers (5 Multi-Audio, 5 English) ──
   const servers: ServerConfig[] = [
-    { name: 'Stvvid',               icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.to/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.to/embed/movie/${ref}` },
-    { name: 'Ophm',                 icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.me/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.me/embed/movie/${ref}` },
-    { name: 'Lolly',                icon: 'IN', lang: 'HI', url: isSeries ? `https://vidlink.pro/embed/tv/${tmdb}/${season}/${episode}`                     : `https://vidlink.pro/embed/movie/${tmdb}` },
-    { name: 'Prvibd',               icon: 'IN', lang: 'HI', url: isSeries ? `https://embed.su/embed/tv/${tmdb}/${season}/${episode}`                        : `https://embed.su/embed/movie/${tmdb}` },
-    { name: 'AwsPly-[Multi-Lang]',  icon: 'IN', lang: 'HI', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
-    { name: 'VidStpM',              icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.pm/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.pm/embed/movie/${ref}` },
+    // 🇮🇳 Multi-Audio / Hindi Dubbed (5 Servers)
+    { name: 'Stvvid Multi', icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.to/embed/tv/${ref}/${season}/${episode}` : `https://vidsrc.to/embed/movie/${ref}` },
+    { name: 'Ophm Multi',   icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.me/embed/tv/${ref}/${season}/${episode}` : `https://vidsrc.me/embed/movie/${ref}` },
+    { name: 'Lolly Multi',  icon: 'IN', lang: 'HI', url: isSeries ? `https://vidlink.pro/embed/tv/${tmdb}/${season}/${episode}` : `https://vidlink.pro/embed/movie/${tmdb}` },
+    { name: 'Prvibd Multi', icon: 'IN', lang: 'HI', url: isSeries ? `https://embed.su/embed/tv/${tmdb}/${season}/${episode}` : `https://embed.su/embed/movie/${tmdb}` },
+    { name: 'AwsPly Multi', icon: 'IN', lang: 'HI', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}` : `https://autoembed.co/movie/tmdb/${tmdb}` },
+
+    // 🇺🇸 English & Global (5 Servers)
+    { name: 'Cinemaos Eng', icon: 'US', lang: 'EN', url: isSeries ? `https://vidsrc.to/embed/tv/${ref}/${season}/${episode}` : `https://vidsrc.to/embed/movie/${ref}` },
+    { name: 'Prime Eng',    icon: 'US', lang: 'EN', url: isSeries ? `https://vidlink.pro/embed/tv/${tmdb}/${season}/${episode}` : `https://vidlink.pro/embed/movie/${tmdb}` },
+    { name: 'Netflix Eng',  icon: 'US', lang: 'EN', url: isSeries ? `https://embed.su/embed/tv/${tmdb}/${season}/${episode}` : `https://embed.su/embed/movie/${tmdb}` },
+    { name: 'Hotstar Eng',  icon: 'US', lang: 'EN', url: isSeries ? `https://vidsrc.me/embed/tv/${ref}/${season}/${episode}` : `https://vidsrc.me/embed/movie/${ref}` },
+    { name: 'Vidnest Eng', icon: 'GB', lang: 'EN', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}` : `https://autoembed.co/movie/tmdb/${tmdb}` },
   ];
 
   const recommendations = await fetchHollywoodMovies();
