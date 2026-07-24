@@ -100,7 +100,7 @@ export default async function WatchMoviePage({
           <ChevronLeft className="w-4 h-4" /> Back to Movies
         </Link>
 
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
 
           {/* Main Column */}
           <div className="space-y-5">

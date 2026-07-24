@@ -101,7 +101,7 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
       <div className={`relative bg-[#08080f] overflow-hidden ${
         theaterMode
           ? 'fixed top-2 left-1/2 -translate-x-1/2 w-[98vw] max-w-[1700px] h-[88vh] z-50 rounded-[28px]'
-          : 'aspect-video w-full rounded-t-[20px]'
+          : 'aspect-video w-full max-h-[480px] rounded-t-[20px]'
       }`}>
 
         {/* Currently playing badge */}

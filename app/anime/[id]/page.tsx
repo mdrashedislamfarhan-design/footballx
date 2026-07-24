@@ -153,7 +153,7 @@ export default async function AnimeDetailPage({
         </Link>
 
         {/* Dynamic Grid: Player + Sidebar Info */}
-        <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
           
           {/* Main Column: Player & Episode list */}
           <div className="space-y-6">
