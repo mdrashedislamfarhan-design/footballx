@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { X, Maximize2, Minimize2, Clapperboard, Server, RefreshCw, Play, Sparkles } from 'lucide-react';
+import { X, Maximize2, Minimize2, Clapperboard, Server, RefreshCw, SkipForward, AlertCircle } from 'lucide-react';
 import CountryFlag from '@/components/ui/CountryFlag';
 
 export interface ServerConfig {
   name: string;
   url: string;
-  icon: string; // Flag code: 'IN' | 'US' | 'GB' | 'JP' | 'FR' | 'ES' | 'DE' | 'IT' | 'BR' | 'RU' | 'SA' | 'TR' | 'TH'
-  lang?: string; // 'HI' | 'EN' | 'SUB' | 'DUB' | 'TA' | 'TE' | 'ES' | 'FR' | 'DE' | 'IT' | 'AR' | 'BR' | 'RU' | 'TR' | 'TH'
+  icon: string; // Country flag code: 'IN' | 'US' | 'GB' | 'JP' | 'ES' | 'FR' | 'DE' | 'IT' | 'BR' | 'RU' | 'SA' | 'TR' | 'TH'
+  lang?: string;
 }
 
 interface MultiServerPlayerProps {
@@ -42,7 +42,7 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
   const [activeTab, setActiveTab]         = useState('ALL');
   const [selectedLang, setSelectedLang]   = useState<string | null>(null);
   const [scanIdx, setScanIdx]             = useState(0);
-  const [scanned, setScanned]             = useState<{ name: string; icon: string; ok: boolean }[]>([]);
+  const [scannedResults, setScannedResults] = useState<Record<string, boolean>>({});
   const [currentUrl, setCurrentUrl]       = useState<string | null>(null);
   const [currentServer, setCurrentServer] = useState<ServerConfig | null>(null);
   const [theaterMode, setTheaterMode]     = useState(false);
@@ -51,12 +51,10 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
   const phaseRef    = useRef<Phase>('select');
   const scanIdxRef  = useRef(0);
   const langRef     = useRef<string | null>(null);
-  const scannedRef  = useRef<{ name: string; icon: string; ok: boolean }[]>([]);
 
   useEffect(() => { phaseRef.current = phase; },     [phase]);
   useEffect(() => { scanIdxRef.current = scanIdx; }, [scanIdx]);
   useEffect(() => { langRef.current = selectedLang; },[selectedLang]);
-  useEffect(() => { scannedRef.current = scanned; },  [scanned]);
 
   const langs = Array.from(new Set(servers.map(s => s.lang || 'EN')));
   const filteredServers = activeTab === 'ALL'
@@ -65,41 +63,40 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
   const langServers = selectedLang ? servers.filter(s => (s.lang || 'EN') === selectedLang) : servers;
 
   // ── Scan next server ────────────────────────────────────────────────────────
-  const tryNext = useCallback((lang: string, idx: number, failed: typeof scanned) => {
+  const tryNext = useCallback((lang: string, idx: number) => {
     const ls = servers.filter(s => (s.lang || 'EN') === lang);
     if (idx >= ls.length) { 
-      // All scanned — set phase to playing with whatever we have
-      setPhase('playing'); 
+      // Reached end of list
+      setPhase('playing');
       return; 
     }
 
     setScanIdx(idx);
-    setScanned(failed);
     setCurrentServer(ls[idx]);
     setCurrentUrl(ls[idx].url);
 
-    // Fast 4.5 second timeout per server so scanner moves quickly
+    // Timeout per server (5s)
     if (scanTimer.current) clearTimeout(scanTimer.current);
     scanTimer.current = setTimeout(() => {
       if (phaseRef.current !== 'scanning') return;
-      const newFailed = [...scannedRef.current, { name: ls[idx].name, icon: ls[idx].icon, ok: false }];
-      tryNext(lang, idx + 1, newFailed);
-    }, 4500);
+      // Mark as failed and try next
+      setScannedResults(prev => ({ ...prev, [ls[idx].url]: false }));
+      tryNext(lang, idx + 1);
+    }, 5000);
   }, [servers]);
 
-  // ── Start scanning an entire language (e.g. Indian flag clicked) ───────────
+  // ── Start scanning language category ───────────────────────────────────────
   const startScanLanguage = useCallback((lang: string) => {
     if (scanTimer.current) clearTimeout(scanTimer.current);
     setSelectedLang(lang);
     setModalOpen(false);
     setPhase('scanning');
     setScanIdx(0);
-    setScanned([]);
     setCurrentUrl(null);
-    setTimeout(() => tryNext(lang, 0, []), 50);
+    setTimeout(() => tryNext(lang, 0), 50);
   }, [tryNext]);
 
-  // ── Start scanning from a specific server card ─────────────────────────────
+  // ── Start scanning from a specific server ──────────────────────────────────
   const startFromServer = useCallback((srv: ServerConfig) => {
     if (scanTimer.current) clearTimeout(scanTimer.current);
     const lang = srv.lang || 'EN';
@@ -109,33 +106,53 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
     setSelectedLang(lang);
     setModalOpen(false);
     setPhase('scanning');
-    setScanIdx(0);
-    setScanned([]);
-    setCurrentUrl(null);
-    setTimeout(() => tryNext(lang, Math.max(0, startAt), []), 50);
+    setScanIdx(Math.max(0, startAt));
+    setCurrentUrl(srv.url);
+    setCurrentServer(srv);
+
+    if (scanTimer.current) clearTimeout(scanTimer.current);
+    scanTimer.current = setTimeout(() => {
+      if (phaseRef.current !== 'scanning') return;
+      setScannedResults(prev => ({ ...prev, [srv.url]: false }));
+      tryNext(lang, Math.max(0, startAt) + 1);
+    }, 5000);
   }, [servers, tryNext]);
+
+  // ── User manually skips broken server ─────────────────────────────────────
+  const skipCurrentServer = useCallback(() => {
+    if (!currentServer || !selectedLang) return;
+    if (scanTimer.current) clearTimeout(scanTimer.current);
+
+    // Mark current server as bad (red X)
+    setScannedResults(prev => ({ ...prev, [currentServer.url]: false }));
+
+    const ls = servers.filter(s => (s.lang || 'EN') === selectedLang);
+    const nextIdx = (scanIdxRef.current + 1) % ls.length;
+
+    setPhase('scanning');
+    tryNext(selectedLang, nextIdx);
+  }, [currentServer, selectedLang, servers, tryNext]);
 
   // ── iframe loaded ───────────────────────────────────────────────────────────
   const handleLoad = useCallback(() => {
     if (phaseRef.current !== 'scanning') return;
     if (scanTimer.current) clearTimeout(scanTimer.current);
-    const lang = langRef.current!;
-    const ls   = servers.filter(s => (s.lang || 'EN') === lang);
-    const idx  = scanIdxRef.current;
-    setScanned(prev => [...prev, { name: ls[idx]?.name || '', icon: ls[idx]?.icon || 'US', ok: true }]);
+    if (currentServer) {
+      setScannedResults(prev => ({ ...prev, [currentServer.url]: true }));
+    }
     setPhase('playing');
-  }, [servers]);
+  }, [currentServer]);
 
   // ── iframe error ────────────────────────────────────────────────────────────
   const handleError = useCallback(() => {
     if (phaseRef.current !== 'scanning') return;
     if (scanTimer.current) clearTimeout(scanTimer.current);
+    if (currentServer) {
+      setScannedResults(prev => ({ ...prev, [currentServer.url]: false }));
+    }
     const lang = langRef.current!;
-    const ls   = servers.filter(s => (s.lang || 'EN') === lang);
-    const idx  = scanIdxRef.current;
-    const newFailed = [...scannedRef.current, { name: ls[idx]?.name || '', icon: ls[idx]?.icon || 'US', ok: false }];
-    tryNext(lang, idx + 1, newFailed);
-  }, [servers, tryNext]);
+    tryNext(lang, scanIdxRef.current + 1);
+  }, [currentServer, tryNext]);
 
   // ── Keyboard shortcuts ──────────────────────────────────────────────────────
   useEffect(() => {
@@ -218,38 +235,38 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
                 {meta.label} Auto-Scan
               </span>
             )}
-            <p className="text-white/40 text-[11px]">Scanning high-speed servers automatically...</p>
+            <p className="text-white/40 text-[11px]">Testing high-speed servers automatically...</p>
 
             {/* Progress bar */}
             <div className="w-full max-w-xs">
               <div className="flex justify-between text-[10px] font-black mb-1" style={{ color: meta?.color || '#888' }}>
-                <span>{scanned.length} ANALYZED</span>
-                <span>{Math.max(0, langServers.length - scanned.length)} REMAINING</span>
+                <span>SERVER {scanIdx + 1} OF {langServers.length}</span>
+                <span>{langServers[scanIdx]?.name}</span>
               </div>
               <div className="h-[4px] bg-white/10 rounded-full overflow-hidden">
                 <div className="h-full rounded-full transition-all duration-500"
                   style={{
-                    width: `${Math.round((scanned.length / Math.max(langServers.length, 1)) * 100)}%`,
+                    width: `${Math.round(((scanIdx + 1) / Math.max(langServers.length, 1)) * 100)}%`,
                     background: `linear-gradient(to right, ${meta?.color || '#8B5CF6'}, #EC4899)`,
                   }} />
               </div>
             </div>
 
-            {/* Server scan boxes */}
+            {/* Server scan grid */}
             <div className="flex flex-wrap justify-center gap-2 max-w-md max-h-40 overflow-y-auto custom-scrollbar p-1">
               {langServers.map((s, i) => {
-                const res = scanned[i];
+                const res = scannedResults[s.url];
                 const isCur = i === scanIdx;
                 return (
                   <div key={i} className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[10px] font-black transition-all ${
-                    res?.ok        ? 'bg-green-500/15 border-green-500/40 text-green-400' :
-                    res?.ok===false? 'bg-red-500/10 border-red-500/20 text-red-400/40' :
-                    isCur          ? 'bg-[#8B5CF6]/20 border-[#8B5CF6]/60 text-[#A78BFA] animate-pulse' :
+                    res === true   ? 'bg-green-500/15 border-green-500/40 text-green-400' :
+                    res === false  ? 'bg-red-500/10 border-red-500/20 text-red-400/40 opacity-40 line-through' :
+                    isCur          ? 'bg-[#8B5CF6]/20 border-[#8B5CF6]/60 text-[#A78BFA] animate-pulse scale-105' :
                                      'bg-white/[0.02] border-white/[0.05] text-white/20'
                   }`}>
                     <CountryFlag code={s.icon} size={14} />
                     <span className="max-w-[60px] truncate">{s.name}</span>
-                    <span className="text-[10px]">{res?.ok ? '✓' : res?.ok===false ? '✗' : isCur ? '⟳' : ''}</span>
+                    <span className="text-[10px]">{res === true ? '✓' : res === false ? '✗' : isCur ? '⟳' : ''}</span>
                   </div>
                 );
               })}
@@ -258,6 +275,20 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
             <button onClick={() => { if(scanTimer.current) clearTimeout(scanTimer.current); setPhase('select'); setCurrentUrl(null); }}
               className="text-white/40 hover:text-white text-[11px] transition-colors mt-1">
               ← Cancel Scan
+            </button>
+          </div>
+        )}
+
+        {/* PLAYING phase overlay banner: Skip Server button */}
+        {phase === 'playing' && (
+          <div className="absolute top-3 left-3 z-30 flex items-center gap-2">
+            <button
+              onClick={skipCurrentServer}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/80 backdrop-blur-md border border-white/20 text-white text-[11px] font-black hover:bg-[#8B5CF6] hover:border-transparent transition-all shadow-lg group"
+              title="If 404 or video not playing, click to switch to next working server"
+            >
+              <SkipForward className="w-3.5 h-3.5 text-[#F59E0B] group-hover:text-white" />
+              <span>404 or Not Playing? Try Next Server ⏭️</span>
             </button>
           </div>
         )}
@@ -284,6 +315,17 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
               <CountryFlag code={currentServer.icon} size={14} />
               {currentServer.name}
             </span>
+          )}
+
+          {phase === 'playing' && (
+            <button
+              onClick={skipCurrentServer}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[10px] font-bold text-[#F59E0B] hover:text-white bg-[#F59E0B]/10 border border-[#F59E0B]/20 hover:bg-[#F59E0B] transition-all flex-shrink-0"
+              title="Next Server"
+            >
+              <SkipForward className="w-3 h-3" />
+              <span>Next Server</span>
+            </button>
           )}
         </div>
 
@@ -313,8 +355,8 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06] flex-shrink-0">
               <div>
-                <h2 className="text-white font-black text-sm">Now Watching: <span className="text-[#A78BFA]">{title}</span></h2>
-                <p className="text-[#F59E0B] text-[10px] font-bold mt-0.5">🔔 Click any flag/server to auto-scan and play working stream.</p>
+                <h2 className="text-white font-black text-sm">Select Server: <span className="text-[#A78BFA]">{title}</span></h2>
+                <p className="text-[#F59E0B] text-[10px] font-bold mt-0.5">🔔 Click any flag/server card to test and play stream.</p>
               </div>
               <button onClick={() => setModalOpen(false)}
                 className="w-8 h-8 rounded-xl bg-white/[0.05] border border-white/10 flex items-center justify-center text-white/50 hover:text-white">
@@ -344,18 +386,23 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
               <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-5 gap-2.5">
                 {filteredServers.map((srv, i) => {
                   const isActive = phase === 'playing' && currentServer?.url === srv.url;
+                  const res = scannedResults[srv.url];
                   return (
                     <button key={i} onClick={() => startFromServer(srv)}
                       className={`group flex flex-col items-center gap-2 py-3 px-2 rounded-2xl border transition-all hover:scale-[1.05] active:scale-95 ${
-                        isActive
+                        res === false
+                          ? 'bg-red-500/10 border-red-500/20 opacity-50'
+                          : isActive
                           ? 'bg-[#8B5CF6]/20 border-[#8B5CF6]/60 shadow-[0_0_16px_rgba(139,92,246,0.4)]'
                           : 'bg-white/[0.03] border-white/[0.07] hover:bg-white/[0.08] hover:border-white/20'
                       }`}>
                       <CountryFlag code={srv.icon} size={28} />
                       <span className="text-white text-[10px] font-black leading-tight text-center truncate max-w-full">{srv.name}</span>
-                      {isActive && (
+                      {res === false ? (
+                        <span className="text-[7px] font-black px-1.5 py-0.5 rounded-full bg-red-500/30 text-red-400">✗ BAD</span>
+                      ) : isActive ? (
                         <span className="text-[7px] font-black px-1.5 py-0.5 rounded-full bg-[#8B5CF6] text-white">✓ ON</span>
-                      )}
+                      ) : null}
                     </button>
                   );
                 })}
