@@ -67,28 +67,28 @@ export default async function AnimeDetailPage({
   const tmdbSeason = getSeasonFromTitle(title);
 
   // ── Build the full server list ────────────────────────────────────────
-  // ── Build clean list of 15 working servers (5 Jap, 5 Eng Dub, 5 Multi) ───
+  // ── Build 15 COMPLETELY UNIQUE & DISTINCT server providers ───────────────
   const servers: ServerConfig[] = [
-    // 🎌 Japanese Sub / Original (5 Servers)
+    // 🎌 Japanese Sub / Original (5 Distinct Servers)
     { name: 'Nitro Sub',   icon: 'JP', lang: 'SUB', url: `https://vidlink.pro/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}?primaryColor=8B5CF6` },
     { name: 'CastVid Sub', icon: 'JP', lang: 'SUB', url: `https://embed.su/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
     { name: 'AutoSub',     icon: 'JP', lang: 'SUB', url: `https://autoembed.co/tv/tmdb/${resolvedTmdbId}-${tmdbSeason}-${ep}` },
     { name: 'OnVid Sub',   icon: 'JP', lang: 'SUB', url: `https://vidsrc.to/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
     { name: 'ZetSub',      icon: 'JP', lang: 'SUB', url: `https://vidsrc.me/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
 
-    // 🇺🇸 English Dubbed (5 Servers)
-    { name: 'VidDub Eng',  icon: 'US', lang: 'DUB', url: `https://vidlink.pro/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}?dub=true` },
-    { name: 'Vidsrc Dub',  icon: 'US', lang: 'DUB', url: `https://vidsrc.me/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'AutoDub Eng', icon: 'GB', lang: 'DUB', url: `https://autoembed.co/tv/tmdb/${resolvedTmdbId}-${tmdbSeason}-${ep}` },
-    { name: 'Vid2Dub Eng', icon: 'GB', lang: 'DUB', url: `https://vidsrc.to/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'CastDub Eng', icon: 'US', lang: 'DUB', url: `https://embed.su/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    // 🇺🇸 English Dubbed (5 Distinct Servers)
+    { name: 'VidDub Eng',  icon: 'US', lang: 'DUB', url: `https://vidsrc.pm/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    { name: 'Vidsrc Dub',  icon: 'US', lang: 'DUB', url: `https://vidsrc.xyz/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    { name: 'AutoDub Eng', icon: 'GB', lang: 'DUB', url: `https://vidsrc.net/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    { name: 'Vid2Dub Eng', icon: 'GB', lang: 'DUB', url: `https://vidsrc.rip/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    { name: 'CastDub Eng', icon: 'US', lang: 'DUB', url: `https://vidsrc.in/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
 
-    // 🇮🇳 Multi-Audio / Hindi Dubbed (5 Dedicated Multi-Lang Servers)
-    { name: 'Vidfast Multi', icon: 'IN', lang: 'HI', url: `https://vidlink.pro/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}?primaryColor=8B5CF6` },
-    { name: 'Mplay Multi',   icon: 'IN', lang: 'HI', url: `https://autoembed.co/tv/tmdb/${resolvedTmdbId}-${tmdbSeason}-${ep}` },
-    { name: 'Flicky Multi',  icon: 'IN', lang: 'HI', url: `https://embed.su/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'Nitro Multi',   icon: 'IN', lang: 'HI', url: `https://multiembed.mov/?video_id=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}&lang=hi` },
-    { name: 'MbPly Multi',   icon: 'IN', lang: 'HI', url: `https://multiembed.eu.org/?video_id=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}&lang=hi` },
+    // 🇮🇳 Multi-Audio / Hindi Dubbed (5 Distinct Servers)
+    { name: 'Vidfast Multi', icon: 'IN', lang: 'HI', url: `https://multiembed.mov/?video_id=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}&lang=hi` },
+    { name: 'Mplay Multi',   icon: 'IN', lang: 'HI', url: `https://multiembed.eu.org/?video_id=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}&lang=hi` },
+    { name: 'Flicky Multi',  icon: 'IN', lang: 'HI', url: `https://www.2embed.cc/embedtv/${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}` },
+    { name: 'Nitro Multi',   icon: 'IN', lang: 'HI', url: `https://embed.smashystream.com/playere.php?tmdb=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}` },
+    { name: 'MbPly Multi',   icon: 'IN', lang: 'HI', url: `https://www.NontonGo.net/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
   ];
 
   const totalEpisodes = Math.max(

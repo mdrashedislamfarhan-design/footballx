@@ -118,7 +118,7 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
         {/* Grid of Working Servers (3-4 Columns) */}
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
           {servers.map((srv, idx) => {
-            const isPlaying = activeServer?.url === srv.url;
+            const isPlaying = activeServer?.name === srv.name;
             return (
               <button
                 key={idx}

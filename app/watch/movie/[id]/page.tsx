@@ -38,12 +38,12 @@ export default async function WatchMoviePage({
     { name: 'Nitro Multi',  icon: 'IN', lang: 'HI', url: isSeries ? `https://multiembed.mov/?video_id=${tmdb}&s=${season}&e=${episode}&lang=hi`    : `https://multiembed.mov/?video_id=${tmdb}&lang=hi` },
     { name: 'MbPly Multi',  icon: 'IN', lang: 'HI', url: isSeries ? `https://multiembed.eu.org/?video_id=${tmdb}&s=${season}&e=${episode}&lang=hi` : `https://multiembed.eu.org/?video_id=${tmdb}&lang=hi` },
 
-    // 🇺🇸 English & Global (5 Original Audio Servers)
+    // 🇺🇸 English & Global (5 Distinct Original Audio Servers)
     { name: 'Stvvid Eng',   icon: 'US', lang: 'EN', url: isSeries ? `https://vidsrc.to/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.to/embed/movie/${ref}` },
     { name: 'Ophm Eng',     icon: 'US', lang: 'EN', url: isSeries ? `https://vidsrc.me/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.me/embed/movie/${ref}` },
-    { name: 'Cinemaos Eng', icon: 'US', lang: 'EN', url: isSeries ? `https://vidlink.pro/embed/tv/${tmdb}/${season}/${episode}`                     : `https://vidlink.pro/embed/movie/${tmdb}` },
-    { name: 'Prime Eng',    icon: 'US', lang: 'EN', url: isSeries ? `https://embed.su/embed/tv/${tmdb}/${season}/${episode}`                        : `https://embed.su/embed/movie/${tmdb}` },
-    { name: 'Netflix Eng',  icon: 'GB', lang: 'EN', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
+    { name: 'Cinemaos Eng', icon: 'US', lang: 'EN', url: isSeries ? `https://vidsrc.pm/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.pm/embed/movie/${ref}` },
+    { name: 'Prime Eng',    icon: 'US', lang: 'EN', url: isSeries ? `https://vidsrc.xyz/embed/tv/${tmdb}/${season}/${episode}`                       : `https://vidsrc.xyz/embed/movie/${tmdb}` },
+    { name: 'Netflix Eng',  icon: 'GB', lang: 'EN', url: isSeries ? `https://vidsrc.net/embed/tv/${tmdb}/${season}/${episode}`                       : `https://vidsrc.net/embed/movie/${tmdb}` },
   ];
 
   const recommendations = await fetchHollywoodMovies();
