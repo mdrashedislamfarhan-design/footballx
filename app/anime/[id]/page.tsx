@@ -145,7 +145,7 @@ export default async function AnimeDetailPage({
         <div className="absolute inset-0 bg-[#0a0a0f]/40" />
       </div>
 
-      <div className="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 -mt-48 pt-16 relative z-10 pb-20">
+      <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-8 -mt-48 pt-16 relative z-10 pb-20">
         
         {/* Back Link */}
         <Link href="/" className="inline-flex items-center gap-2 text-sm text-[#999] hover:text-white transition-colors mb-6">
@@ -153,7 +153,7 @@ export default async function AnimeDetailPage({
         </Link>
 
         {/* Dynamic Grid: Player + Sidebar Info */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6 items-start">
           
           {/* Main Column: Player & Episode list */}
           <div className="space-y-6">

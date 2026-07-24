@@ -95,12 +95,12 @@ export default async function WatchMoviePage({
         )}
       </div>
 
-      <div className="max-w-[1440px] mx-auto px-4 md:px-8 lg:px-12 -mt-52 pt-16 relative z-10 pb-20">
+      <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-8 -mt-52 pt-16 relative z-10 pb-20">
         <Link href="/movies" className="inline-flex items-center gap-2 text-sm text-[#999] hover:text-white transition-colors mb-6">
           <ChevronLeft className="w-4 h-4" /> Back to Movies
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 items-start">
+        <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6 items-start">
 
           {/* Main Column */}
           <div className="space-y-5">
