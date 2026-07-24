@@ -535,6 +535,13 @@ export async function fetchMovies(type?: 'hollywood' | 'bollywood'): Promise<Mov
 export async function findTmdbTvIdByTitle(title: string): Promise<number | null> {
   const data = await tmdb('/search/tv', { query: title });
   if (data?.results && data.results.length > 0) {
+    // 1. First priority: Anime match (genre 16 = Animation, or Japanese language/origin)
+    const animeMatch = data.results.find((item: any) =>
+      item.genre_ids?.includes(16) || item.original_language === 'ja' || item.origin_country?.includes('JP')
+    );
+    if (animeMatch) return animeMatch.id;
+
+    // 2. Fallback to top search result
     return data.results[0].id;
   }
   return null;

@@ -61,9 +61,31 @@ export default async function AnimeDetailPage({
   const streamId = anime.idMal || anime.id;
   const slugTitle = anime.title.romaji?.toLowerCase().replace(/[^a-z0-9]+/g, '-') || '';
 
-  // Resolve TMDB TV ID and Season for TMDB-based providers (like embed.su, vidsrc.in/xyz, moviesapi)
+  // Top Anime TMDB TV ID Mapping Dictionary (prevents Live-Action Netflix series matches)
+  const KNOWN_ANIME_TMDB_MAP: Record<number, number> = {
+    21:     37854,  // One Piece (Anime 1999)
+    20:     20986,  // Naruto
+    16498:  1429,   // Attack on Titan
+    101922: 85937,  // Demon Slayer
+    113415: 98870,  // Jujutsu Kaisen
+    21459:  65930,  // My Hero Academia
+    1535:   13916,  // Death Note
+    269:    30984,  // Bleach
+    225:    12971,  // Dragon Ball Z
+    11061:  46298,  // Hunter x Hunter 2011
+    127549: 114410, // Chainsaw Man
+    110277: 94605,  // Tokyo Revengers
+    97940:  71446,  // Black Clover
+    105333: 86034,  // Dr. Stone
+    108632: 95479,  // Jujutsu Kaisen 0
+  };
+
   const tmdbSearchTitle = cleanTitleForTmdb(title);
-  const resolvedTmdbId = await findTmdbTvIdByTitle(tmdbSearchTitle) || await findTmdbTvIdByTitle(title) || streamId;
+  const resolvedTmdbId = KNOWN_ANIME_TMDB_MAP[anime.id]
+    || await findTmdbTvIdByTitle(tmdbSearchTitle)
+    || await findTmdbTvIdByTitle(anime.title.romaji || title)
+    || await findTmdbTvIdByTitle(anime.title.english || title)
+    || streamId;
   const tmdbSeason = getSeasonFromTitle(title);
 
   // ── Build the full server list ────────────────────────────────────────
