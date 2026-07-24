@@ -31,21 +31,21 @@ export default async function WatchMoviePage({
 
   // ── Build the full server list (50+ servers) ─────────────────────────
   const servers: ServerConfig[] = [
-    // 🇮🇳 Indian / Hindi Dubbed servers (15 servers)
-    { name: 'Hmovies', icon: 'IN', lang: 'HI', url: isSeries ? `https://multiembed.mov/?video_id=${tmdb}&s=${season}&e=${episode}&lang=hi`    : `https://multiembed.mov/?video_id=${tmdb}&lang=hi` },
-    { name: 'NHD',     icon: 'IN', lang: 'HI', url: isSeries ? `https://multiembed.eu.org/?video_id=${tmdb}&s=${season}&e=${episode}&lang=hi` : `https://multiembed.eu.org/?video_id=${tmdb}&lang=hi` },
-    { name: 'Mplay',   icon: 'IN', lang: 'HI', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
-    { name: 'Vidfast', icon: 'IN', lang: 'HI', url: isSeries ? `https://vidlink.pro/embed/tv/${tmdb}/${season}/${episode}?primaryColor=8B5CF6` : `https://vidlink.pro/embed/movie/${tmdb}?primaryColor=8B5CF6` },
-    { name: 'Flicky',  icon: 'IN', lang: 'HI', url: isSeries ? `https://embed.su/embed/tv/${tmdb}/${season}/${episode}`                        : `https://embed.su/embed/movie/${tmdb}` },
-    { name: 'Lolly',   icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.to/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.to/embed/movie/${ref}` },
-    { name: 'Sboid',   icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.me/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.me/embed/movie/${ref}` },
-    { name: 'AwsPly',  icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.pm/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.pm/embed/movie/${ref}` },
-    { name: 'Pnilid',  icon: 'IN', lang: 'HI', url: isSeries ? `https://www.2embed.cc/embedtv/${ref}&s=${season}&e=${episode}`                 : `https://www.2embed.cc/embed/${ref}` },
-    { name: 'ZetPly',  icon: 'IN', lang: 'HI', url: isSeries ? `https://embed.smashystream.com/playere.php?tmdb=${tmdb}&s=${season}&e=${episode}` : `https://embed.smashystream.com/playere.php?tmdb=${tmdb}` },
-    { name: 'OrVid',   icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.net/embed/tv/${tmdb}/${season}/${episode}`                  : `https://vidsrc.net/embed/movie/${tmdb}` },
-    { name: 'QsPly',   icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.xyz/embed/tv/${tmdb}/${season}/${episode}`                  : `https://vidsrc.xyz/embed/movie/${tmdb}` },
-    { name: 'Prvlbd',  icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.rip/embed/tv/${tmdb}/${season}/${episode}`                  : `https://vidsrc.rip/embed/movie/${tmdb}` },
-    { name: 'Stvld',   icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.in/embed/tv/${tmdb}/${season}/${episode}`                   : `https://vidsrc.in/embed/movie/${tmdb}` },
+    // 🇮🇳 Multi-Lang / Hindi Dubbed servers (Exact list from reference site)
+    { name: 'Nitro - [Multi-Lang]', icon: 'IN', lang: 'HI', url: isSeries ? `https://multiembed.mov/?video_id=${tmdb}&s=${season}&e=${episode}&lang=hi`    : `https://multiembed.mov/?video_id=${tmdb}&lang=hi` },
+    { name: 'MbPly-[Multi-Lang]',   icon: 'IN', lang: 'HI', url: isSeries ? `https://multiembed.eu.org/?video_id=${tmdb}&s=${season}&e=${episode}&lang=hi` : `https://multiembed.eu.org/?video_id=${tmdb}&lang=hi` },
+    { name: 'AwsPly-[Multi-Lang]',  icon: 'IN', lang: 'HI', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
+    { name: 'Lolly',                icon: 'IN', lang: 'HI', url: isSeries ? `https://vidlink.pro/embed/tv/${tmdb}/${season}/${episode}`                     : `https://vidlink.pro/embed/movie/${tmdb}` },
+    { name: 'Prvibd',               icon: 'IN', lang: 'HI', url: isSeries ? `https://embed.su/embed/tv/${tmdb}/${season}/${episode}`                        : `https://embed.su/embed/movie/${tmdb}` },
+    { name: 'Stvvid',               icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.to/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.to/embed/movie/${ref}` },
+    { name: 'Ophm',                 icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.me/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.me/embed/movie/${ref}` },
+    { name: 'VidStpM',              icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.pm/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.pm/embed/movie/${ref}` },
+    { name: 'Hmovies',              icon: 'IN', lang: 'HI', url: isSeries ? `https://www.2embed.cc/embedtv/${ref}&s=${season}&e=${episode}`                 : `https://www.2embed.cc/embed/${ref}` },
+    { name: 'NHD',                  icon: 'IN', lang: 'HI', url: isSeries ? `https://embed.smashystream.com/playere.php?tmdb=${tmdb}&s=${season}&e=${episode}` : `https://embed.smashystream.com/playere.php?tmdb=${tmdb}` },
+    { name: 'Mplay',                icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.net/embed/tv/${tmdb}/${season}/${episode}`                  : `https://vidsrc.net/embed/movie/${tmdb}` },
+    { name: 'Vidfast',              icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.xyz/embed/tv/${tmdb}/${season}/${episode}`                  : `https://vidsrc.xyz/embed/movie/${tmdb}` },
+    { name: 'Flicky',               icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.rip/embed/tv/${tmdb}/${season}/${episode}`                  : `https://vidsrc.rip/embed/movie/${tmdb}` },
+    { name: 'Sboid',                icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.in/embed/tv/${tmdb}/${season}/${episode}`                   : `https://vidsrc.in/embed/movie/${tmdb}` },
     { name: 'Ophm',    icon: 'IN', lang: 'HI', url: isSeries ? `https://multiembed.mov/?video_id=${ref}&s=${season}&e=${episode}&lang=hi`   : `https://multiembed.mov/?video_id=${ref}&lang=hi` },
 
     // 🇺🇸 / 🇬🇧 English servers (20 servers)
