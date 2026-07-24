@@ -1,77 +1,41 @@
 {
-  "name": "FootballX",
-  "short_name": "FootballX",
-  "description": "Every Match. Every Moment. Live.",
+  "name": "Okazaki",
+  "short_name": "Okazaki",
+  "description": "Watch Anime, Movies & Series Free Online — Sub, Dub & Hindi.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#050505",
-  "theme_color": "#00E676",
+  "background_color": "#0a0a0f",
+  "theme_color": "#8B5CF6",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icons/icon-72x72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icons/icon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icons/icon-128x128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icons/icon-144x144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icons/icon-152x152.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icons/icon-192x192.png",
+      "src": "/icon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable any"
     },
     {
-      "src": "/icons/icon-384x384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "/icons/icon-512x512.png",
+      "src": "/icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable any"
     }
   ],
-  "categories": ["sports", "news"],
+  "categories": ["entertainment", "streaming"],
   "shortcuts": [
     {
-      "name": "Watch Live",
-      "short_name": "Watch",
-      "description": "Open Live TV channels",
-      "url": "/watch",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+      "name": "Browse Anime",
+      "short_name": "Anime",
+      "description": "Browse all anime",
+      "url": "/browse",
+      "icons": [{ "src": "/icon.png", "sizes": "192x192" }]
     },
     {
-      "name": "Live Scores",
-      "short_name": "Live",
-      "description": "Check live match scores",
-      "url": "/live",
-      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+      "name": "Watch Movies",
+      "short_name": "Movies",
+      "description": "Hollywood & Bollywood Movies",
+      "url": "/movies",
+      "icons": [{ "src": "/icon.png", "sizes": "192x192" }]
     }
   ]
 }

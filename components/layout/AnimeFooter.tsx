@@ -73,13 +73,12 @@ export default function AnimeFooter() {
           <div className="col-span-2 md:col-span-1 space-y-4">
             <Link href="/" className="flex items-center gap-2">
               <img
-                src="/logo_img.png?v=2"
-                alt="AniStreamBD"
+                src="/logo_img.png?v=3"
+                alt="Okazaki"
                 className="w-9 h-9 rounded-xl object-cover shadow-[0_0_15px_rgba(139,92,246,0.4)] border border-white/10 shrink-0"
               />
               <span className="text-base font-black whitespace-nowrap">
-                <span className="text-white">AniStream</span>
-                <span className="bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] bg-clip-text text-transparent">BD</span>
+                <span className="bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] bg-clip-text text-transparent">Okazaki</span>
               </span>
             </Link>
             <p className="text-xs text-[#555] leading-relaxed max-w-[200px]">
@@ -122,7 +121,7 @@ export default function AnimeFooter() {
             <a href="https://anilist.co" target="_blank" rel="noopener" className="text-[#8B5CF6] hover:underline">AniList</a>.
             {' '}Movie data by{' '}
             <a href="https://www.themoviedb.org" target="_blank" rel="noopener" className="text-[#EC4899] hover:underline">TMDB</a>.
-            {' '}AniStreamBD — Your ultimate destination for free anime &amp; movie streaming.
+            {' '}Okazaki — Your ultimate destination for free anime &amp; movie streaming.
           </p>
           <p className="text-[11px] text-[#444] flex items-center gap-1.5 shrink-0">
             <Sparkles className="w-3 h-3 text-[#8B5CF6]" />

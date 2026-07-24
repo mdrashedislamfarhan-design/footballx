@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Clapperboard, Server, X } from 'lucide-react';
+import { Server } from 'lucide-react';
 import CountryFlag from '@/components/ui/CountryFlag';
 
 export interface ServerConfig {
@@ -19,7 +19,6 @@ interface MultiServerPlayerProps {
 export default function MultiServerPlayer({ servers, title }: MultiServerPlayerProps) {
   const [activeServer, setActiveServer] = useState<ServerConfig | null>(servers[0] || null);
   const [currentUrl, setCurrentUrl]     = useState<string | null>(servers[0]?.url || null);
-  const [theaterMode, setTheaterMode]   = useState(false);
 
   // Sync if servers prop changes
   useEffect(() => {
@@ -35,44 +34,14 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
     setCurrentUrl(srv.url);
   };
 
-  // Keyboard shortcut for theater mode
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.target instanceof HTMLInputElement) return;
-      if (e.key === 't' || e.key === 'T') setTheaterMode(p => !p);
-      if (e.key === 'Escape') setTheaterMode(false);
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
   return (
-    <div className={`w-full space-y-4 ${theaterMode ? 'relative z-50' : ''}`}>
-
-      {/* Theater Overlay */}
-      {theaterMode && (
-        <>
-          <div onClick={() => setTheaterMode(false)} className="fixed inset-0 z-40 bg-black/95 backdrop-blur-md cursor-pointer" />
-          <div className="fixed top-5 right-6 z-[60]">
-            <button
-              onClick={() => setTheaterMode(false)}
-              className="flex items-center gap-2 px-4 py-2 bg-[#FF5252] text-white text-xs font-black rounded-xl shadow-lg hover:scale-105 transition-all"
-            >
-              <X className="w-4 h-4" /> Exit Theater (Esc)
-            </button>
-          </div>
-        </>
-      )}
+    <div className="w-full space-y-4">
 
       {/* ── Main Video Player Frame (Standard 16:9) ─────────────────────────── */}
-      <div className={`relative bg-[#08080f] overflow-hidden ${
-        theaterMode
-          ? 'fixed top-2 left-1/2 -translate-x-1/2 w-[98vw] max-w-[1700px] h-[88vh] z-50 rounded-[28px]'
-          : 'aspect-video w-full rounded-2xl border border-white/[0.08] shadow-2xl'
-      }`}>
+      <div className="relative bg-[#08080f] overflow-hidden aspect-video w-full rounded-2xl border border-white/[0.08] shadow-2xl">
 
-        {/* Top Badges Overlay */}
-        <div className="absolute top-3 inset-x-3 z-30 flex items-center justify-between pointer-events-none">
+        {/* Top Badge Overlay */}
+        <div className="absolute top-3 inset-x-3 z-30 flex items-center pointer-events-none">
           {/* Active Server Badge */}
           {activeServer && (
             <div className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 bg-black/75 backdrop-blur-md border border-white/10 rounded-xl text-white text-xs font-bold shadow-md">
@@ -80,15 +49,6 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
               <span className="text-white/90">Playing on: <strong className="text-[#8B5CF6]">{activeServer.name}</strong></span>
             </div>
           )}
-
-          {/* Theater Mode Button */}
-          <button
-            onClick={() => setTheaterMode(t => !t)}
-            className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 bg-black/75 backdrop-blur-md border border-white/10 text-white/80 hover:text-white rounded-xl text-xs font-bold transition-all"
-          >
-            <Clapperboard className="w-3.5 h-3.5" />
-            <span>{theaterMode ? 'Exit' : 'Theater'}</span>
-          </button>
         </div>
 
         {/* Video iframe */}

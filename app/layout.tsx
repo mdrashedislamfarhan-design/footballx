@@ -6,13 +6,13 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import UpdateNotifier from '@/components/ui/UpdateNotifier';
 
 export const metadata: Metadata = {
-  title: { default: 'AniStreamBD — Watch Anime & Movies Free Online', template: '%s | AniStreamBD' },
-  description: 'Watch your favorite anime, Hollywood & Bollywood movies free online in HD.',
-  keywords: ['anime', 'watch anime', 'free anime', 'movies', 'streaming', 'AniStreamBD'],
+  title: { default: 'Okazaki — Watch Anime & Movies Free Online', template: '%s | Okazaki' },
+  description: 'Watch your favorite anime, Hollywood & Bollywood movies free online in HD on Okazaki.',
+  keywords: ['anime', 'watch anime', 'free anime', 'movies', 'streaming', 'Okazaki'],
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    siteName: 'AniStreamBD',
+    siteName: 'Okazaki',
   },
 };
 

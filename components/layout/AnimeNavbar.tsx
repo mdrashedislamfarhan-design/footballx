@@ -76,13 +76,12 @@ export default function AnimeNavbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0 min-w-0">
           <img
-            src="/logo_img.png?v=2"
-            alt="AniStreamBD"
+            src="/logo_img.png?v=3"
+            alt="Okazaki"
             className="w-9 h-9 rounded-xl object-cover shadow-[0_0_15px_rgba(139,92,246,0.5)] border border-white/10 shrink-0"
           />
           <span className="text-lg font-black tracking-tight whitespace-nowrap">
-            <span className="text-white">AniStream</span>
-            <span className="bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] bg-clip-text text-transparent">BD</span>
+            <span className="bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] bg-clip-text text-transparent">Okazaki</span>
           </span>
         </Link>
 
