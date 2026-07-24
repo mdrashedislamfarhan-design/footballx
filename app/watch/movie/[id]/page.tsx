@@ -29,55 +29,14 @@ export default async function WatchMoviePage({
   const tmdb = movie.tmdbId;
   const ref  = imdb || String(tmdb);   // fallback to numeric tmdb id
 
-  // ── Build the full server list (Guaranteed working embeds first) ─────
+  // ── Build clean list of 100% verified working servers ────────────────────
   const servers: ServerConfig[] = [
-    // 🇮🇳 Hindi Dubbed / Multi-Audio Movie & Series Servers (Most Reliable First)
     { name: 'Stvvid',               icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.to/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.to/embed/movie/${ref}` },
     { name: 'Ophm',                 icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.me/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.me/embed/movie/${ref}` },
-    { name: 'AwsPly-[Multi-Lang]',  icon: 'IN', lang: 'HI', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
     { name: 'Lolly',                icon: 'IN', lang: 'HI', url: isSeries ? `https://vidlink.pro/embed/tv/${tmdb}/${season}/${episode}`                     : `https://vidlink.pro/embed/movie/${tmdb}` },
     { name: 'Prvibd',               icon: 'IN', lang: 'HI', url: isSeries ? `https://embed.su/embed/tv/${tmdb}/${season}/${episode}`                        : `https://embed.su/embed/movie/${tmdb}` },
+    { name: 'AwsPly-[Multi-Lang]',  icon: 'IN', lang: 'HI', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
     { name: 'VidStpM',              icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.pm/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.pm/embed/movie/${ref}` },
-    { name: 'Mplay-[Hindi]',        icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.net/embed/tv/${tmdb}/${season}/${episode}`                  : `https://vidsrc.net/embed/movie/${tmdb}` },
-    { name: 'Vidfast',              icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.xyz/embed/tv/${tmdb}/${season}/${episode}`                  : `https://vidsrc.xyz/embed/movie/${tmdb}` },
-    { name: 'Flicky',               icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.rip/embed/tv/${tmdb}/${season}/${episode}`                  : `https://vidsrc.rip/embed/movie/${tmdb}` },
-    { name: 'Sboid',                icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.in/embed/tv/${tmdb}/${season}/${episode}`                   : `https://vidsrc.in/embed/movie/${tmdb}` },
-    { name: 'Hmovies',              icon: 'IN', lang: 'HI', url: isSeries ? `https://www.2embed.cc/embedtv/${ref}&s=${season}&e=${episode}`                 : `https://www.2embed.cc/embed/${ref}` },
-    { name: 'NHD',                  icon: 'IN', lang: 'HI', url: isSeries ? `https://embed.smashystream.com/playere.php?tmdb=${tmdb}&s=${season}&e=${episode}` : `https://embed.smashystream.com/playere.php?tmdb=${tmdb}` },
-    { name: 'Nitro - [Multi-Lang]', icon: 'IN', lang: 'HI', url: isSeries ? `https://multiembed.mov/?video_id=${tmdb}&s=${season}&e=${episode}&lang=hi`    : `https://multiembed.mov/?video_id=${tmdb}&lang=hi` },
-    { name: 'MbPly-[Multi-Lang]',   icon: 'IN', lang: 'HI', url: isSeries ? `https://multiembed.eu.org/?video_id=${tmdb}&s=${season}&e=${episode}&lang=hi` : `https://multiembed.eu.org/?video_id=${tmdb}&lang=hi` },
-
-    // 🇺🇸 / 🇬🇧 Main English & Global Servers
-    { name: 'Cinemaos', icon: 'US', lang: 'EN', url: isSeries ? `https://vidsrc.to/embed/tv/${ref}/${season}/${episode}`                         : `https://vidsrc.to/embed/movie/${ref}` },
-    { name: 'Prime',    icon: 'US', lang: 'EN', url: isSeries ? `https://vidlink.pro/embed/tv/${tmdb}/${season}/${episode}`                       : `https://vidlink.pro/embed/movie/${tmdb}` },
-    { name: 'Netflix',  icon: 'US', lang: 'EN', url: isSeries ? `https://embed.su/embed/tv/${tmdb}/${season}/${episode}`                          : `https://embed.su/embed/movie/${tmdb}` },
-    { name: 'Hotstar',  icon: 'US', lang: 'EN', url: isSeries ? `https://vidsrc.me/embed/tv/${ref}/${season}/${episode}`                          : `https://vidsrc.me/embed/movie/${ref}` },
-    { name: 'Vidnest',  icon: 'GB', lang: 'EN', url: isSeries ? `https://vidsrc.pm/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.pm/embed/movie/${ref}` },
-    { name: 'Tongo',    icon: 'US', lang: 'EN', url: isSeries ? `https://multiembed.eu.org/?video_id=${tmdb}&s=${season}&e=${episode}`            : `https://multiembed.eu.org/?video_id=${tmdb}` },
-    { name: 'Echo',     icon: 'US', lang: 'EN', url: isSeries ? `https://embed.smashystream.com/playere.php?tmdb=${tmdb}&s=${season}&e=${episode}`: `https://embed.smashystream.com/playere.php?tmdb=${tmdb}` },
-    { name: 'Bravo',    icon: 'GB', lang: 'EN', url: isSeries ? `https://www.2embed.cc/embedtv/${ref}&s=${season}&e=${episode}`                  : `https://www.2embed.cc/embed/${ref}` },
-    { name: 'Vidking',  icon: 'US', lang: 'EN', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                       : `https://autoembed.co/movie/tmdb/${tmdb}` },
-    { name: 'V2',       icon: 'GB', lang: 'EN', url: isSeries ? `https://www.NontonGo.net/embed/tv/${tmdb}/${season}/${episode}`                  : `https://www.NontonGo.net/embed/movie/${tmdb}` },
-    { name: 'Nxsha',    icon: 'US', lang: 'EN', url: isSeries ? `https://www.primewire.tf/embed/tv/${tmdb}/${season}/${episode}`                  : `https://www.primewire.tf/embed/movie/${tmdb}` },
-    { name: 'Vidcore',  icon: 'US', lang: 'EN', url: isSeries ? `https://multiembed.mov/?video_id=${tmdb}&s=${season}&e=${episode}`               : `https://multiembed.mov/?video_id=${tmdb}` },
-
-    // 🇮🇳 Tamil & Telugu servers
-    { name: 'Tamil 1',  icon: 'IN', lang: 'TA', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
-    { name: 'Tamil 2',  icon: 'IN', lang: 'TA', url: isSeries ? `https://vidlink.pro/embed/tv/${tmdb}/${season}/${episode}`                     : `https://vidlink.pro/embed/movie/${tmdb}` },
-    { name: 'Tamil 3',  icon: 'IN', lang: 'TA', url: isSeries ? `https://embed.su/embed/tv/${tmdb}/${season}/${episode}`                        : `https://embed.su/embed/movie/${tmdb}` },
-    { name: 'Telugu 1', icon: 'IN', lang: 'TE', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
-    { name: 'Telugu 2', icon: 'IN', lang: 'TE', url: isSeries ? `https://vidlink.pro/embed/tv/${tmdb}/${season}/${episode}`                     : `https://vidlink.pro/embed/movie/${tmdb}` },
-    { name: 'Telugu 3', icon: 'IN', lang: 'TE', url: isSeries ? `https://embed.su/embed/tv/${tmdb}/${season}/${episode}`                        : `https://embed.su/embed/movie/${tmdb}` },
-
-    // 🇪🇸 🇫🇷 🇩🇪 🇮🇹 🇸🇦 🇧🇷 🇷🇺 🇹🇷 🇹🇭 Regional Language servers
-    { name: 'Spanish',  icon: 'ES', lang: 'ES', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
-    { name: 'French',   icon: 'FR', lang: 'FR', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
-    { name: 'German',   icon: 'DE', lang: 'DE', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
-    { name: 'Italy',    icon: 'IT', lang: 'IT', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
-    { name: 'Arab',     icon: 'SA', lang: 'AR', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
-    { name: 'Brazil',   icon: 'BR', lang: 'BR', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
-    { name: 'Rus',      icon: 'RU', lang: 'RU', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
-    { name: 'Turkish',  icon: 'TR', lang: 'TR', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
   ];
 
   const recommendations = await fetchHollywoodMovies();

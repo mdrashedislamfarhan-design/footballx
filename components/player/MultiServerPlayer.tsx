@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { X, Clapperboard, Server, Sparkles, Check, Play, Globe } from 'lucide-react';
+import { Clapperboard, Server, X } from 'lucide-react';
 import CountryFlag from '@/components/ui/CountryFlag';
 
 export interface ServerConfig {
   name: string;
   url: string;
-  icon: string; // Flag code: 'IN' | 'US' | 'GB' | 'JP' | 'FR' | 'ES' | 'DE' | 'IT' | 'BR' | 'RU' | 'SA' | 'TR' | 'TH' | 'PL' | 'PT'
+  icon: string;
   lang?: string;
 }
 
@@ -19,8 +19,6 @@ interface MultiServerPlayerProps {
 export default function MultiServerPlayer({ servers, title }: MultiServerPlayerProps) {
   const [activeServer, setActiveServer] = useState<ServerConfig | null>(servers[0] || null);
   const [currentUrl, setCurrentUrl]     = useState<string | null>(servers[0]?.url || null);
-  const [selectedLang, setSelectedLang] = useState<string>('ALL');
-  const [modalOpen, setModalOpen]       = useState(false);
   const [theaterMode, setTheaterMode]   = useState(false);
 
   // Sync if servers prop changes
@@ -31,59 +29,34 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
     }
   }, [servers, activeServer]);
 
-  // Handle manual server change
+  // Handle manual server selection
   const handleSelectServer = (srv: ServerConfig) => {
     setActiveServer(srv);
     setCurrentUrl(srv.url);
-    setModalOpen(false);
   };
 
-  // Keyboard shortcut for theater mode & Esc
+  // Keyboard shortcut for theater mode
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
       if (e.key === 't' || e.key === 'T') setTheaterMode(p => !p);
-      if (e.key === 'Escape') { setTheaterMode(false); setModalOpen(false); }
+      if (e.key === 'Escape') setTheaterMode(false);
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Filtered servers by selected language tab
-  const filteredServers = selectedLang === 'ALL'
-    ? servers
-    : servers.filter(s => (s.lang || 'EN') === selectedLang);
-
-  // Available language tabs with country flags
-  const langTabs = [
-    { code: 'ALL', name: 'All Servers', icon: 'GLOBE' },
-    { code: 'HI',  name: 'Hindi Dub',  icon: 'IN' },
-    { code: 'SUB', name: 'Jap Sub',    icon: 'JP' },
-    { code: 'DUB', name: 'Eng Dub',    icon: 'US' },
-    { code: 'EN',  name: 'English',    icon: 'GB' },
-    { code: 'TA',  name: 'Tamil',      icon: 'IN' },
-    { code: 'TE',  name: 'Telugu',     icon: 'IN' },
-    { code: 'FR',  name: 'French',     icon: 'FR' },
-    { code: 'ES',  name: 'Spanish',    icon: 'ES' },
-    { code: 'DE',  name: 'German',     icon: 'DE' },
-    { code: 'IT',  name: 'Italian',    icon: 'IT' },
-    { code: 'AR',  name: 'Arab',       icon: 'SA' },
-    { code: 'BR',  name: 'Brazil',     icon: 'BR' },
-    { code: 'RU',  name: 'Russian',    icon: 'RU' },
-    { code: 'TR',  name: 'Turkish',    icon: 'TR' },
-  ];
-
   return (
-    <div className={`w-full ${theaterMode ? 'relative z-50' : ''}`}>
+    <div className={`w-full space-y-4 ${theaterMode ? 'relative z-50' : ''}`}>
 
-      {/* Theater overlay */}
+      {/* Theater Overlay */}
       {theaterMode && (
         <>
           <div onClick={() => setTheaterMode(false)} className="fixed inset-0 z-40 bg-black/95 backdrop-blur-md cursor-pointer" />
           <div className="fixed top-5 right-6 z-[60]">
             <button
               onClick={() => setTheaterMode(false)}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#FF5252] to-[#EF4444] text-white text-xs font-black rounded-xl shadow-[0_0_25px_rgba(255,82,82,0.7)] hover:scale-105 transition-all border border-white/20"
+              className="flex items-center gap-2 px-4 py-2 bg-[#FF5252] text-white text-xs font-black rounded-xl shadow-lg hover:scale-105 transition-all"
             >
               <X className="w-4 h-4" /> Exit Theater (Esc)
             </button>
@@ -91,63 +64,34 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
         </>
       )}
 
-      {/* ── Top Notice Alert Banner ────────────────────────────────────────────── */}
-      <div className="w-full bg-[#FF2A4B] text-white text-xs font-bold px-4 py-2 flex items-center justify-between shadow-lg rounded-t-2xl">
-        <span className="flex items-center gap-2">
-          <span>🔔</span>
-          <span>Please switch to other servers if default server doesn&apos;t work.</span>
-        </span>
-        <button
-          onClick={() => setModalOpen(true)}
-          className="px-3 py-1 bg-white/20 hover:bg-white/30 rounded-lg text-white font-black text-[11px] transition-all"
-        >
-          Select Server
-        </button>
-      </div>
-
-      {/* ── Main Player Frame ─────────────────────────────────────────────────── */}
+      {/* ── Main Video Player Frame (Standard 16:9) ─────────────────────────── */}
       <div className={`relative bg-[#08080f] overflow-hidden ${
         theaterMode
           ? 'fixed top-2 left-1/2 -translate-x-1/2 w-[98vw] max-w-[1700px] h-[88vh] z-50 rounded-[28px]'
-          : 'aspect-video w-full rounded-b-2xl border-x border-b border-white/[0.08] shadow-2xl'
+          : 'aspect-video w-full rounded-2xl border border-white/[0.08] shadow-2xl'
       }`}>
 
-        {/* Top Control Bar Overlay */}
-        <div className="absolute top-3 inset-x-3 z-30 flex items-center justify-between gap-2 pointer-events-none">
-          {/* Left: Active Server Badge */}
+        {/* Top Badges Overlay */}
+        <div className="absolute top-3 inset-x-3 z-30 flex items-center justify-between pointer-events-none">
+          {/* Active Server Badge */}
           {activeServer && (
-            <div className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 bg-black/75 backdrop-blur-md border border-white/10 rounded-xl text-white text-xs font-bold shadow-lg">
+            <div className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 bg-black/75 backdrop-blur-md border border-white/10 rounded-xl text-white text-xs font-bold shadow-md">
               <CountryFlag code={activeServer.icon} size={16} />
               <span className="text-white/90">Playing on: <strong className="text-[#8B5CF6]">{activeServer.name}</strong></span>
             </div>
           )}
 
-          {/* Center / Right: Main Purple "Select a server" Button */}
-          <div className="pointer-events-auto flex items-center gap-2">
-            <button
-              onClick={() => setModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#6366F1] via-[#8B5CF6] to-[#EC4899] text-white text-xs font-black rounded-xl shadow-[0_0_20px_rgba(139,92,246,0.6)] hover:scale-105 transition-all border border-white/20 active:scale-95"
-            >
-              <Server className="w-3.5 h-3.5" />
-              <span>Select a server</span>
-            </button>
-
-            {/* Theater mode button */}
-            <button
-              onClick={() => setTheaterMode(t => !t)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-black transition-all border ${
-                theaterMode
-                  ? 'bg-gradient-to-r from-[#EC4899] to-[#8B5CF6] text-white border-transparent'
-                  : 'bg-black/75 backdrop-blur-md border-white/10 text-white/80 hover:text-white'
-              }`}
-            >
-              <Clapperboard className="w-3.5 h-3.5" />
-              <span>{theaterMode ? 'Exit' : 'Theater'}</span>
-            </button>
-          </div>
+          {/* Theater Mode Button */}
+          <button
+            onClick={() => setTheaterMode(t => !t)}
+            className="pointer-events-auto flex items-center gap-1.5 px-3 py-1.5 bg-black/75 backdrop-blur-md border border-white/10 text-white/80 hover:text-white rounded-xl text-xs font-bold transition-all"
+          >
+            <Clapperboard className="w-3.5 h-3.5" />
+            <span>{theaterMode ? 'Exit' : 'Theater'}</span>
+          </button>
         </div>
 
-        {/* ── Video iframe ──────────────────────────────────────────────────── */}
+        {/* Video iframe */}
         {currentUrl ? (
           <iframe
             key={currentUrl}
@@ -164,137 +108,42 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
         )}
       </div>
 
-      {/* ── SERVER SELECTION SYSTEM BELOW VIDEO PLAYER ───────────────────────── */}
-      <div className="w-full bg-[#0a0a12] border-x border-b border-white/10 rounded-b-[20px] p-4 sm:p-5 flex flex-col gap-4">
+      {/* ── SIMPLE & CLEAN WORKING SERVERS LIST BELOW PLAYER ────────────────── */}
+      <div className="bg-[#111118] border border-white/[0.06] p-4 sm:p-5 rounded-2xl space-y-3">
+        <div className="flex items-center gap-2">
+          <Server className="w-4 h-4 text-[#8B5CF6]" />
+          <h3 className="text-xs font-extrabold text-white uppercase tracking-wider">Select Working Server:</h3>
+        </div>
 
-        {/* Row 1: Language / Country Flag Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto custom-scrollbar pb-1">
-          {langTabs.map((tab) => {
-            const isSelected = selectedLang === tab.code;
+        {/* Grid of Working Servers (3-4 Columns) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
+          {servers.map((srv, idx) => {
+            const isPlaying = activeServer?.url === srv.url;
             return (
               <button
-                key={tab.code}
-                onClick={() => setSelectedLang(tab.code)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black whitespace-nowrap transition-all border ${
-                  isSelected
-                    ? 'bg-gradient-to-r from-[#4F46E5] to-[#8B5CF6] text-white border-transparent shadow-[0_0_15px_rgba(139,92,246,0.4)] scale-105'
-                    : 'bg-white/[0.04] border-white/10 text-white/70 hover:text-white hover:bg-white/10'
+                key={idx}
+                onClick={() => handleSelectServer(srv)}
+                className={`flex items-center justify-between p-3 rounded-xl border text-xs font-extrabold transition-all duration-200 hover:scale-[1.02] active:scale-95 ${
+                  isPlaying
+                    ? 'bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] border-transparent text-white shadow-[0_0_15px_rgba(139,92,246,0.4)]'
+                    : 'bg-white/[0.03] border-white/10 text-white/80 hover:bg-white/[0.08] hover:text-white'
                 }`}
               >
-                {tab.icon === 'GLOBE' ? (
-                  <Globe className="w-3.5 h-3.5 text-[#F59E0B]" />
-                ) : (
-                  <CountryFlag code={tab.icon} size={16} />
+                <div className="flex items-center gap-2.5 truncate">
+                  <CountryFlag code={srv.icon} size={18} />
+                  <span className="truncate max-w-[90px]">{srv.name}</span>
+                </div>
+
+                {isPlaying && (
+                  <div className="w-4 h-4 rounded-full bg-white text-[#8B5CF6] flex items-center justify-center text-[10px] font-black shrink-0">
+                    ✓
+                  </div>
                 )}
-                <span>{tab.name}</span>
               </button>
             );
           })}
         </div>
-
-        {/* Row 2: Grid of Servers for Selected Flag / Language */}
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <span className="text-white/60 text-xs font-bold flex items-center gap-1.5">
-              <Server className="w-3.5 h-3.5 text-[#8B5CF6]" />
-              <span>Available Servers ({filteredServers.length}):</span>
-            </span>
-            <button
-              onClick={() => setModalOpen(true)}
-              className="text-[#8B5CF6] hover:text-[#A78BFA] text-xs font-black underline flex items-center gap-1"
-            >
-              <span>View All ({servers.length})</span>
-            </button>
-          </div>
-
-          {/* 3 Flag Cards Per Row Grid (Compact & Small Text) */}
-          <div className="grid grid-cols-3 gap-2 p-1">
-            {filteredServers.map((srv, idx) => {
-              const isPlaying = activeServer?.url === srv.url;
-              return (
-                <button
-                  key={idx}
-                  onClick={() => handleSelectServer(srv)}
-                  className={`group relative flex items-center justify-between py-2 px-2.5 rounded-xl border text-[11px] font-extrabold transition-all hover:scale-[1.02] active:scale-95 ${
-                    isPlaying
-                      ? 'bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] border-transparent text-white shadow-[0_0_12px_rgba(139,92,246,0.5)]'
-                      : 'bg-white/[0.04] border-white/10 text-white/80 hover:bg-white/[0.08] hover:text-white'
-                  }`}
-                >
-                  <div className="flex items-center gap-2 truncate">
-                    <CountryFlag code={srv.icon} size={16} />
-                    <span className="truncate max-w-[80px] sm:max-w-[100px]">{srv.name}</span>
-                  </div>
-
-                  {isPlaying && (
-                    <div className="w-3.5 h-3.5 rounded-full bg-white text-[#8B5CF6] flex items-center justify-center text-[9px] font-black shrink-0 shadow-sm">
-                      ✓
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
       </div>
-
-      {/* ── ALL SERVERS MODAL ───────────────────────────────────────────────── */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" onClick={() => setModalOpen(false)}>
-          <div className="absolute inset-0 bg-black/85 backdrop-blur-xl" />
-          
-          <div
-            className="relative w-full max-w-3xl bg-[#0d0d14] border border-white/10 rounded-3xl shadow-2xl overflow-hidden flex flex-col"
-            style={{ maxHeight: '85vh' }}
-            onClick={e => e.stopPropagation()}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-white/[0.02]">
-              <div className="flex items-center gap-2">
-                <Server className="w-4 h-4 text-[#8B5CF6]" />
-                <h2 className="text-white font-black text-sm sm:text-base">Select Server ({servers.length} Available)</h2>
-              </div>
-              <button
-                onClick={() => setModalOpen(false)}
-                className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:bg-white/10 transition-all"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Grid of Country Flag Cards */}
-            <div className="p-5 overflow-y-auto custom-scrollbar flex-1">
-              <div className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-6 gap-3">
-                {servers.map((srv, idx) => {
-                  const isPlaying = activeServer?.url === srv.url;
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => handleSelectServer(srv)}
-                      className={`group relative flex flex-col items-center justify-center gap-2 p-3.5 rounded-2xl border transition-all duration-200 hover:scale-105 active:scale-95 ${
-                        isPlaying
-                          ? 'bg-[#4F46E5]/30 border-[#8B5CF6] shadow-[0_0_20px_rgba(139,92,246,0.5)] text-white'
-                          : 'bg-white/[0.03] border-white/[0.08] text-white/80 hover:bg-white/[0.08] hover:text-white'
-                      }`}
-                    >
-                      <CountryFlag code={srv.icon} size={32} />
-                      <span className="text-xs font-black leading-tight text-center truncate max-w-full">
-                        {srv.name}
-                      </span>
-                      {isPlaying && (
-                        <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-[#8B5CF6] text-white flex items-center justify-center text-[9px] font-black shadow-md">
-                          ✓
-                        </div>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
     </div>
   );

@@ -67,35 +67,14 @@ export default async function AnimeDetailPage({
   const tmdbSeason = getSeasonFromTitle(title);
 
   // ── Build the full server list ────────────────────────────────────────
-  // ── Build the full server list (Only tested 100% working embeds) ─────────
+  // ── Build clean list of 100% verified working servers ────────────────────
   const servers: ServerConfig[] = [
-    // 🎌 Japanese Subtitled servers (Primary & Most Reliable)
     { name: 'Nitro',      icon: 'JP', lang: 'SUB', url: `https://vidlink.pro/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}?primaryColor=8B5CF6` },
     { name: 'CastVid',    icon: 'JP', lang: 'SUB', url: `https://embed.su/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
     { name: 'AutoSub',    icon: 'JP', lang: 'SUB', url: `https://autoembed.co/tv/tmdb/${resolvedTmdbId}-${tmdbSeason}-${ep}` },
     { name: 'OnVid',      icon: 'JP', lang: 'SUB', url: `https://vidsrc.to/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
     { name: 'ZetSub',     icon: 'JP', lang: 'SUB', url: `https://vidsrc.me/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-
-    // 🇮🇳 Hindi Dubbed & Multi-Audio anime servers
-    { name: 'Vidfast',    icon: 'IN', lang: 'HI', url: `https://vidlink.pro/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}?primaryColor=8B5CF6` },
-    { name: 'Flicky',     icon: 'IN', lang: 'HI', url: `https://embed.su/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'Mplay',      icon: 'IN', lang: 'HI', url: `https://autoembed.co/tv/tmdb/${resolvedTmdbId}-${tmdbSeason}-${ep}` },
-    { name: 'Hmovies',    icon: 'IN', lang: 'HI', url: `https://vidsrc.to/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'NHD',        icon: 'IN', lang: 'HI', url: `https://vidsrc.me/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-
-    // 🇺🇸 English Dubbed servers
     { name: 'VidDub',     icon: 'US', lang: 'DUB', url: `https://vidlink.pro/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}?dub=true` },
-    { name: 'VidsrcDub',  icon: 'US', lang: 'DUB', url: `https://vidsrc.me/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'AutoDub',    icon: 'GB', lang: 'DUB', url: `https://autoembed.co/tv/tmdb/${resolvedTmdbId}-${tmdbSeason}-${ep}` },
-    { name: 'Vid2Dub',    icon: 'GB', lang: 'DUB', url: `https://vidsrc.to/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-
-    // 🌎 Global International servers
-    { name: 'Cinemaos',   icon: 'US', lang: 'EN', url: `https://vidlink.pro/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'Prime',      icon: 'US', lang: 'EN', url: `https://vidsrc.to/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'Netflix',    icon: 'US', lang: 'EN', url: `https://embed.su/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'French',     icon: 'FR', lang: 'FR', url: `https://multiembed.mov/?video_id=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}&lang=fr` },
-    { name: 'Spanish',    icon: 'ES', lang: 'ES', url: `https://multiembed.mov/?video_id=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}&lang=es` },
-    { name: 'German',     icon: 'DE', lang: 'DE', url: `https://multiembed.mov/?video_id=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}&lang=de` },
   ];
 
   const totalEpisodes = Math.max(
