@@ -1,25 +1,21 @@
 'use client';
+
 import { useState, useRef, useCallback, useEffect } from 'react';
 import {
-  ChevronLeft,
-  ChevronRight,
-  RefreshCw,
-  AlertCircle,
-  Wifi,
-  ChevronDown,
-  ChevronUp,
-  Settings2,
+  X,
   Maximize2,
   Minimize2,
   Clapperboard,
-  X,
+  Server,
+  RefreshCw,
+  ChevronLeft,
 } from 'lucide-react';
 
 export interface ServerConfig {
   name: string;
   url: string;
   icon: string;
-  lang?: string; // 'EN' | 'HI' | 'SUB' | 'DUB'
+  lang?: string; // 'EN' | 'HI' | 'SUB' | 'DUB' | 'TA' | 'TE'
 }
 
 interface MultiServerPlayerProps {
@@ -27,296 +23,390 @@ interface MultiServerPlayerProps {
   title?: string;
 }
 
-const langColors: Record<string, string> = {
-  HI:  'bg-[#F59E0B] text-black',
-  EN:  'bg-[#8B5CF6] text-white',
-  SUB: 'bg-[#3B82F6] text-white',
-  DUB: 'bg-[#10B981] text-white',
+// ── Language metadata ─────────────────────────────────────────────────────────
+const LANG_META: Record<string, { flag: string; label: string; color: string }> = {
+  HI:  { flag: '🇮🇳', label: 'Hindi',        color: '#FF9933' },
+  EN:  { flag: '🌎', label: 'English',        color: '#3B82F6' },
+  SUB: { flag: '🎌', label: 'Japanese Sub',   color: '#E60026' },
+  DUB: { flag: '🇺🇸', label: 'English Dub',  color: '#3C3B6E' },
+  TA:  { flag: '🇮🇳', label: 'Tamil',         color: '#138808' },
+  TE:  { flag: '🇮🇳', label: 'Telugu',        color: '#FF6B35' },
 };
 
-const langLabels: Record<string, string> = {
-  SUB: '🎌 Sub',
-  DUB: '🇺🇸 Dub',
-  EN:  '🌎 English',
-  HI:  '🇮🇳 Hindi',
-};
+type Phase = 'select' | 'scanning' | 'playing';
 
 export default function MultiServerPlayer({ servers, title }: MultiServerPlayerProps) {
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [loading, setLoading]       = useState(true);
-  const [errorCount, setErrorCount] = useState(0);
-  const [tried, setTried]           = useState<Set<number>>(new Set([0]));
-  const [panelOpen, setPanelOpen]   = useState(true);
-  const [activeTab, setActiveTab]   = useState<string>('ALL');
-  const [theaterMode, setTheaterMode] = useState(false);
+  const [phase, setPhase]               = useState<Phase>('select');
+  const [modalOpen, setModalOpen]       = useState(false);
+  const [selectedLang, setSelectedLang] = useState<string | null>(null);
+  const [scanIdx, setScanIdx]           = useState(0);
+  const [scanned, setScanned]           = useState<{ name: string; icon: string; ok: boolean }[]>([]);
+  const [currentUrl, setCurrentUrl]     = useState<string | null>(null);
+  const [theaterMode, setTheaterMode]   = useState(false);
 
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-  const timerRef  = useRef<NodeJS.Timeout | null>(null);
+  const scanTimer = useRef<NodeJS.Timeout | null>(null);
+  const scanIdxRef = useRef(0);
+  const selectedLangRef = useRef<string | null>(null);
+  const phaseRef = useRef<Phase>('select');
 
-  const total   = servers.length;
-  const current = servers[currentIdx];
+  // Keep refs in sync
+  useEffect(() => { scanIdxRef.current = scanIdx; }, [scanIdx]);
+  useEffect(() => { selectedLangRef.current = selectedLang; }, [selectedLang]);
+  useEffect(() => { phaseRef.current = phase; }, [phase]);
 
-  // Collect unique lang tabs
-  const tabs = ['ALL', ...Array.from(new Set(servers.map(s => s.lang || 'EN')))];
+  // Unique langs available
+  const langs = Array.from(new Set(servers.map(s => s.lang || 'EN')));
 
-  // Filtered servers for active tab
-  const filteredServers = activeTab === 'ALL'
-    ? servers
-    : servers.filter(s => (s.lang || 'EN') === activeTab);
+  // Servers for currently selected language
+  const langServers = selectedLang
+    ? servers.filter(s => (s.lang || 'EN') === selectedLang)
+    : [];
 
-  const goTo = useCallback((idx: number) => {
-    const safeIdx = (idx + total) % total;
-    setCurrentIdx(safeIdx);
-    setLoading(true);
-    setErrorCount(0);
-    setTried(prev => new Set([...prev, safeIdx]));
-    if (timerRef.current) clearTimeout(timerRef.current);
-  }, [total]);
+  // ── Try next server in scan ─────────────────────────────────────────────────
+  const tryNext = useCallback((lang: string, idx: number, failedList: { name: string; icon: string; ok: boolean }[]) => {
+    const ls = servers.filter(s => (s.lang || 'EN') === lang);
+    if (idx >= ls.length) {
+      // All exhausted — show playing with last url anyway
+      setPhase('playing');
+      return;
+    }
+    setScanIdx(idx);
+    setScanned(failedList);
+    setCurrentUrl(ls[idx].url);
 
-  const next = () => goTo(currentIdx + 1);
-  const prev = () => goTo(currentIdx - 1);
+    // Auto-timeout: if iframe doesn't respond in 8s, mark as failed
+    if (scanTimer.current) clearTimeout(scanTimer.current);
+    scanTimer.current = setTimeout(() => {
+      if (phaseRef.current !== 'scanning') return;
+      const newFailed = [...failedList, { name: ls[idx].name, icon: ls[idx].icon, ok: false }];
+      tryNext(lang, idx + 1, newFailed);
+    }, 8000);
+  }, [servers]);
 
-  // Auto-skip after 12 s if still loading
+  // ── Start scanning a language ───────────────────────────────────────────────
+  const startScan = useCallback((lang: string) => {
+    if (scanTimer.current) clearTimeout(scanTimer.current);
+    setSelectedLang(lang);
+    setModalOpen(false);
+    setPhase('scanning');
+    setScanIdx(0);
+    setScanned([]);
+    setCurrentUrl(null);
+    setTimeout(() => tryNext(lang, 0, []), 100);
+  }, [tryNext]);
+
+  // ── iframe loaded ───────────────────────────────────────────────────────────
+  const handleLoad = useCallback(() => {
+    if (phaseRef.current !== 'scanning') return;
+    if (scanTimer.current) clearTimeout(scanTimer.current);
+    const lang = selectedLangRef.current!;
+    const ls = servers.filter(s => (s.lang || 'EN') === lang);
+    const idx = scanIdxRef.current;
+    setScanned(prev => [...prev, { name: ls[idx]?.name || '', icon: ls[idx]?.icon || '', ok: true }]);
+    setPhase('playing');
+  }, [servers]);
+
+  // ── iframe errored ──────────────────────────────────────────────────────────
+  const handleError = useCallback(() => {
+    if (phaseRef.current !== 'scanning') return;
+    if (scanTimer.current) clearTimeout(scanTimer.current);
+    const lang = selectedLangRef.current!;
+    const ls = servers.filter(s => (s.lang || 'EN') === lang);
+    const idx = scanIdxRef.current;
+    const newFailed = [...scanned, { name: ls[idx]?.name || '', icon: ls[idx]?.icon || '', ok: false }];
+    tryNext(lang, idx + 1, newFailed);
+  }, [servers, scanned, tryNext]);
+
+  // ── Theater mode keyboard shortcuts ────────────────────────────────────────
   useEffect(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      if (loading && tried.size < total) {
-        const nextUntried = servers.findIndex((_, i) => !tried.has(i) && i !== currentIdx);
-        if (nextUntried !== -1) goTo(nextUntried);
-        else setLoading(false);
-      } else {
-        setLoading(false);
-      }
-    }, 12000);
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, [currentIdx, loading]);
-
-  // Keyboard shortcut listener ('t' for Theater Mode, 'Escape' to exit)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handler = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.key === 't' || e.key === 'T') {
-        setTheaterMode(prev => !prev);
-      } else if (e.key === 'Escape' && theaterMode) {
-        setTheaterMode(false);
-      }
+      if (e.key === 't' || e.key === 'T') setTheaterMode(p => !p);
+      if (e.key === 'Escape' && theaterMode) setTheaterMode(false);
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
   }, [theaterMode]);
 
-  const handleLoad  = () => { setLoading(false); if (timerRef.current) clearTimeout(timerRef.current); };
-  const handleError = () => {
-    setErrorCount(c => c + 1);
-    if (errorCount >= 0 && currentIdx < total - 1) setTimeout(() => goTo(currentIdx + 1), 800);
-    else setLoading(false);
+  // ── Reset to select ─────────────────────────────────────────────────────────
+  const reset = () => {
+    if (scanTimer.current) clearTimeout(scanTimer.current);
+    setPhase('select');
+    setModalOpen(false);
+    setCurrentUrl(null);
+    setSelectedLang(null);
+    setScanned([]);
+    setScanIdx(0);
   };
 
+  // ── Retry current server ────────────────────────────────────────────────────
+  const retry = () => {
+    if (!selectedLang) return;
+    const ls = servers.filter(s => (s.lang || 'EN') === selectedLang);
+    setCurrentUrl(null);
+    setTimeout(() => setCurrentUrl(ls[scanIdx]?.url || null), 100);
+  };
+
+  const meta = selectedLang ? (LANG_META[selectedLang] || { flag: '🌐', label: selectedLang, color: '#666' }) : null;
+
   return (
-    <div className={`w-full space-y-0 ${theaterMode ? 'relative z-50' : ''}`}>
-      
-      {/* ── Theater Mode Dimmed Overlay & Floating Exit Button ───── */}
+    <div className={`w-full ${theaterMode ? 'relative z-50' : ''}`}>
+
+      {/* ── Theater mode dimmed overlay & exit button ──────────────────────── */}
       {theaterMode && (
         <>
-          <div
-            onClick={() => setTheaterMode(false)}
-            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-md transition-opacity duration-300 animate-fadeIn cursor-pointer"
-            title="Click outside to exit theater mode"
-          />
-          {/* Always visible Floating Exit Button on Top-Right */}
-          <div className="fixed top-5 right-6 z-[60] flex items-center gap-3">
+          <div onClick={() => setTheaterMode(false)} className="fixed inset-0 z-40 bg-black/95 backdrop-blur-md cursor-pointer" />
+          <div className="fixed top-5 right-6 z-[60]">
             <button
               onClick={() => setTheaterMode(false)}
               className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#FF5252] to-[#EF4444] text-white text-xs font-black rounded-xl shadow-[0_0_25px_rgba(255,82,82,0.7)] hover:scale-105 transition-all border border-white/20"
             >
-              <X className="w-4 h-4" />
-              <span>Exit Theater (Esc)</span>
+              <X className="w-4 h-4" /> Exit Theater (Esc)
             </button>
           </div>
         </>
       )}
 
-      {/* ── Player Wrapper (100% Clean Video Frame — ZERO Text Inside Video) ── */}
+      {/* ── Player wrapper ─────────────────────────────────────────────────── */}
       <div
-        className={`relative transition-all duration-500 ease-in-out bg-[#0c0c12] border border-white/[0.08] shadow-2xl shadow-black/90 ${
+        className={`relative bg-[#080810] overflow-hidden ${
           theaterMode
-            ? 'fixed top-2 left-1/2 -translate-x-1/2 w-[98vw] max-w-[1700px] h-[88vh] z-50 rounded-[28px] overflow-hidden'
-            : 'aspect-video w-full rounded-t-[24px] overflow-hidden'
+            ? 'fixed top-2 left-1/2 -translate-x-1/2 w-[98vw] max-w-[1700px] h-[88vh] z-50 rounded-[28px]'
+            : 'aspect-video w-full rounded-t-[24px]'
         }`}
       >
-        {/* Loading Overlay */}
-        {loading && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#0a0a0f]/80 backdrop-blur-sm gap-4">
-            <div className="relative">
-              <div className="w-16 h-16 rounded-full border-4 border-[#8B5CF6]/20 border-t-[#8B5CF6] animate-spin" />
-              <Wifi className="absolute inset-0 m-auto w-6 h-6 text-[#8B5CF6]" />
-            </div>
-            <div className="text-center">
-              <p className="text-sm font-black text-white">Connecting to server...</p>
-              <p className="text-xs text-[#555] mt-1">
-                {current.icon} {current.name}
-                {current.lang && (
-                  <span className={`ml-2 px-1.5 py-0.5 rounded text-[9px] font-black ${langColors[current.lang] || 'bg-white/10 text-white'}`}>
-                    {current.lang}
-                  </span>
-                )}
-              </p>
-            </div>
-            <p className="text-[10px] text-[#444]">Auto-switching if server doesn&apos;t respond...</p>
+
+        {/* ── Phase: SELECT ─────────────────────────────────────────────────── */}
+        {phase === 'select' && (
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-5 bg-[#08080f]">
+            {title && (
+              <p className="text-white/40 text-sm font-bold px-4 text-center max-w-xs truncate">{title}</p>
+            )}
+            <button
+              onClick={() => setModalOpen(true)}
+              className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] text-white text-sm font-black rounded-2xl shadow-[0_0_50px_rgba(139,92,246,0.45)] hover:scale-[1.04] active:scale-95 transition-all"
+            >
+              <Server className="w-5 h-5" />
+              Select a Server
+            </button>
+            <p className="text-white/20 text-xs">Choose your preferred language to start watching</p>
           </div>
         )}
 
-        {/* Clean Video Iframe */}
-        <iframe
-          ref={iframeRef}
-          key={`${currentIdx}-${current.url}`}
-          src={current.url}
-          className="w-full h-full"
-          allowFullScreen
-          allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
-          referrerPolicy="origin"
-          onLoad={handleLoad}
-          onError={handleError}
-        />
+        {/* ── Phase: SCANNING ───────────────────────────────────────────────── */}
+        {phase === 'scanning' && (
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-5 bg-[#08080f] p-6">
+            {title && <p className="text-white font-black text-sm text-center max-w-xs">{title}</p>}
+            {meta && (
+              <div className="flex items-center gap-2 px-4 py-2 rounded-xl border" style={{ background: `${meta.color}15`, borderColor: `${meta.color}40` }}>
+                <span className="text-xl">{meta.flag}</span>
+                <span className="text-white text-xs font-black">{meta.label}</span>
+              </div>
+            )}
+            <p className="text-white/40 text-xs -mt-2">Scanning high-speed servers...</p>
+
+            {/* Progress bar */}
+            <div className="w-full max-w-sm">
+              <div className="flex justify-between text-[10px] font-black mb-1.5" style={{ color: meta?.color || '#888' }}>
+                <span>{scanned.length} ANALYZED</span>
+                <span>{Math.max(0, langServers.length - scanned.length)} REMAINING</span>
+              </div>
+              <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{
+                    width: `${Math.round((scanned.length / Math.max(langServers.length, 1)) * 100)}%`,
+                    background: `linear-gradient(to right, ${meta?.color || '#8B5CF6'}, #EC4899)`,
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Server boxes being scanned */}
+            <div className="flex flex-wrap justify-center gap-2 max-w-sm">
+              {langServers.map((s, i) => {
+                const result = scanned[i];
+                const isCurrent = i === scanIdx;
+                return (
+                  <div
+                    key={i}
+                    className={`flex flex-col items-center gap-1 px-3 py-2 rounded-xl border text-[9px] font-black transition-all duration-300 ${
+                      result?.ok
+                        ? 'bg-green-500/15 border-green-500/40 text-green-400'
+                        : result?.ok === false
+                        ? 'bg-red-500/10 border-red-500/20 text-red-400/40'
+                        : isCurrent
+                        ? 'bg-[#8B5CF6]/15 border-[#8B5CF6]/50 text-[#A78BFA] animate-pulse'
+                        : 'bg-white/[0.02] border-white/[0.05] text-white/20'
+                    }`}
+                  >
+                    <span className="text-base leading-none">
+                      {result?.ok ? '✓' : result?.ok === false ? '✗' : isCurrent ? '⟳' : s.icon}
+                    </span>
+                    <span className="max-w-[52px] truncate">
+                      {s.name.replace('Hindi ', '').replace('Main ', '').replace('Dub ', '')}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Cancel button */}
+            <button onClick={reset} className="text-white/30 hover:text-white/60 text-xs transition-colors mt-1">
+              ← Cancel
+            </button>
+          </div>
+        )}
+
+        {/* ── iframe (rendered when url is set) ─────────────────────────────── */}
+        {currentUrl && (
+          <iframe
+            key={currentUrl}
+            src={currentUrl}
+            className="w-full h-full"
+            allowFullScreen
+            allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+            referrerPolicy="origin"
+            onLoad={handleLoad}
+            onError={handleError}
+          />
+        )}
       </div>
 
-      {/* ── Control Bar Below Video (Zero Text inside video frame) ─────── */}
-      <div className="w-full flex items-center justify-between px-4 py-3 bg-[#0e0e16] border-x border-white/[0.06] border-t border-t-white/[0.04]">
-        {/* Server Info */}
-        <button
-          onClick={() => setPanelOpen(p => !p)}
-          className="flex items-center gap-2 text-xs font-bold text-[#888] hover:text-white transition-colors"
-        >
-          <Settings2 className="w-3.5 h-3.5 text-[#8B5CF6]" />
-          <span>{current.icon} {current.name}</span>
-          {current.lang && (
-            <span className={`px-1.5 py-0.5 rounded text-[8px] font-black ${langColors[current.lang] || 'bg-white/10 text-white'}`}>
-              {current.lang}
-            </span>
-          )}
-          <span className="text-[10px] text-[#555] ml-1">
-            {panelOpen ? <ChevronUp className="w-3 h-3 inline" /> : <ChevronDown className="w-3 h-3 inline" />}
-          </span>
-        </button>
+      {/* ── Control bar below video ────────────────────────────────────────── */}
+      <div className="w-full flex items-center justify-between px-4 py-3 bg-[#0e0e16] border-x border-white/[0.06] border-t border-t-white/[0.04] rounded-b-[20px]">
 
-        {/* Theater Mode Button Outside Video */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Change server button */}
           <button
-            onClick={() => setTheaterMode(t => !t)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all border ${
-              theaterMode
-                ? 'bg-gradient-to-r from-[#EC4899] to-[#8B5CF6] text-white border-transparent shadow-[0_0_15px_rgba(236,72,153,0.5)]'
-                : 'bg-white/[0.05] border-white/10 text-[#aaa] hover:text-white hover:bg-white/[0.1] hover:border-[#8B5CF6]/30'
-            }`}
-            title="Press 'T' for Theater Mode"
+            onClick={() => setModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-[#888] hover:text-white bg-white/[0.03] border border-white/[0.06] hover:border-[#8B5CF6]/30 transition-all"
           >
-            <Clapperboard className="w-3.5 h-3.5 text-[#A78BFA]" />
-            {theaterMode ? (
-              <>
-                <Minimize2 className="w-3.5 h-3.5" />
-                <span>Exit Theater</span>
-              </>
-            ) : (
-              <>
-                <Maximize2 className="w-3.5 h-3.5" />
-                <span>Theater Mode</span>
-              </>
-            )}
+            <Server className="w-3.5 h-3.5 text-[#8B5CF6]" />
+            {phase === 'select' ? 'Select Server' : 'Change Server'}
           </button>
 
-          {theaterMode && (
-            <button
-              onClick={() => setTheaterMode(false)}
-              className="px-3 py-1.5 rounded-xl bg-[#FF5252]/20 border border-[#FF5252]/40 text-[#FF5252] hover:bg-[#FF5252] hover:text-white text-xs font-bold transition-all"
-              title="Close (Esc)"
+          {/* Current lang badge */}
+          {phase === 'playing' && meta && (
+            <span
+              className="text-[10px] font-black px-2.5 py-1 rounded-lg border"
+              style={{ background: `${meta.color}15`, color: meta.color, borderColor: `${meta.color}35` }}
             >
-              <X className="w-3.5 h-3.5" />
+              {meta.flag} {meta.label}
+            </span>
+          )}
+
+          {/* Retry current */}
+          {phase === 'playing' && (
+            <button
+              onClick={retry}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[10px] font-bold text-[#666] hover:text-white bg-white/[0.02] border border-white/[0.05] hover:border-white/10 transition-all"
+              title="Retry current server"
+            >
+              <RefreshCw className="w-3 h-3" />
             </button>
           )}
         </div>
+
+        {/* Theater mode */}
+        <button
+          onClick={() => setTheaterMode(t => !t)}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black transition-all border ${
+            theaterMode
+              ? 'bg-gradient-to-r from-[#EC4899] to-[#8B5CF6] text-white border-transparent shadow-[0_0_15px_rgba(236,72,153,0.4)]'
+              : 'bg-white/[0.05] border-white/10 text-[#aaa] hover:text-white hover:bg-white/[0.1]'
+          }`}
+          title="Press 'T' for Theater Mode"
+        >
+          <Clapperboard className="w-3.5 h-3.5" />
+          {theaterMode
+            ? <><Minimize2 className="w-3.5 h-3.5" /><span>Exit Theater</span></>
+            : <><Maximize2 className="w-3.5 h-3.5" /><span>Theater Mode</span></>
+          }
+        </button>
       </div>
 
-      {/* ── Server Control Panel (Collapsible) ──────────── */}
-      {panelOpen && (
-        <div className="bg-[#111118] border border-t-0 border-white/[0.06] rounded-b-[20px] p-4 space-y-4">
-          {/* Lang Tabs */}
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {tabs.map(tab => (
+      {/* ── Language Selection Modal ───────────────────────────────────────── */}
+      {modalOpen && (
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4"
+          onClick={() => setModalOpen(false)}
+        >
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-black/85 backdrop-blur-lg" />
+
+          {/* Modal card */}
+          <div
+            className="relative w-full max-w-md bg-[#111118] border border-white/[0.08] rounded-3xl shadow-2xl overflow-hidden"
+            onClick={e => e.stopPropagation()}
+            style={{ maxHeight: '85vh' }}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between p-5 border-b border-white/[0.06]">
+              <div className="flex items-center gap-2.5">
+                {phase !== 'select' && (
+                  <button onClick={() => setModalOpen(false)} className="w-7 h-7 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white transition-colors">
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                )}
+                <div>
+                  <h2 className="text-white font-black text-sm">Select Server</h2>
+                  {title && <p className="text-white/30 text-[10px] mt-0.5 max-w-[220px] truncate">{title}</p>}
+                </div>
+              </div>
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-3 py-1 rounded-lg text-[10px] font-black transition-all border ${
-                  activeTab === tab
-                    ? 'bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] border-transparent text-white shadow-[0_0_10px_rgba(139,92,246,0.25)]'
-                    : 'bg-white/[0.03] border-white/[0.06] text-[#666] hover:text-white hover:border-white/[0.1]'
-                }`}
+                onClick={() => setModalOpen(false)}
+                className="w-8 h-8 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-white/50 hover:text-white transition-colors"
               >
-                {tab === 'ALL' ? '🌐 All' : (langLabels[tab] || tab)}
+                <X className="w-4 h-4" />
               </button>
-            ))}
-            <span className="ml-auto text-[10px] text-[#444] font-black">{currentIdx + 1} / {total}</span>
-          </div>
+            </div>
 
-          {/* Server Pills */}
-          <div className="flex flex-wrap gap-2 max-h-[160px] overflow-y-auto custom-scrollbar pr-1">
-            {filteredServers.map((srv) => {
-              const realIdx = servers.indexOf(srv);
-              const isActive  = realIdx === currentIdx;
-              const isHindi   = srv.lang === 'HI';
-              return (
-                <button
-                  key={realIdx}
-                  onClick={() => goTo(realIdx)}
-                  title={`${srv.name}${srv.lang ? ` (${srv.lang})` : ''}`}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-black transition-all duration-200 border ${
-                    isActive
-                      ? isHindi
-                        ? 'bg-gradient-to-r from-[#F59E0B] to-[#EC4899] border-transparent text-white shadow-[0_0_12px_rgba(245,158,11,0.3)] scale-95'
-                        : 'bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] border-transparent text-white shadow-[0_0_12px_rgba(139,92,246,0.3)] scale-95'
-                      : isHindi
-                        ? 'bg-[#F59E0B]/[0.04] border-[#F59E0B]/25 text-[#888] hover:text-white hover:border-[#F59E0B]/50'
-                        : 'bg-white/[0.02] border-white/[0.06] text-[#666] hover:text-white hover:border-[#8B5CF6]/30'
-                  }`}
-                >
-                  <span>{srv.icon}</span>
-                  <span className="truncate max-w-[80px]">{srv.name}</span>
-                  {srv.lang && !isActive && (
-                    <span className={`text-[8px] px-1 rounded font-black ${langColors[srv.lang] || 'bg-white/10'}`}>
-                      {srv.lang}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
+            {/* Warning bar */}
+            <div className="mx-4 mt-4 p-2.5 rounded-xl bg-[#F59E0B]/10 border border-[#F59E0B]/20 flex items-center gap-2">
+              <span className="text-[#FCD34D] text-sm">⚠️</span>
+              <p className="text-[#FCD34D] text-[10px] font-bold">Please switch to other servers if default server doesn&apos;t work.</p>
+            </div>
 
-          {/* Prev/Next Server */}
-          <div className="flex gap-2 pt-1 border-t border-white/[0.04]">
-            <button
-              onClick={prev}
-              className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl bg-white/[0.03] border border-white/[0.05] text-xs font-bold text-[#777] hover:text-white hover:border-[#8B5CF6]/30 transition-all"
-            >
-              <ChevronLeft className="w-4 h-4" /> Previous Server
-            </button>
-            <button
-              onClick={() => goTo(currentIdx)}
-              className="flex items-center justify-center gap-1 px-3 py-2 rounded-xl bg-white/[0.03] border border-white/[0.05] text-[10px] font-bold text-[#666] hover:text-white transition-all"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={next}
-              className="flex-1 flex items-center justify-center gap-2 py-2 rounded-xl bg-gradient-to-r from-[#8B5CF6]/10 to-[#EC4899]/10 border border-[#8B5CF6]/20 text-xs font-bold text-[#A78BFA] hover:text-white hover:border-[#8B5CF6]/50 transition-all"
-            >
-              Next Server <ChevronRight className="w-4 h-4" />
-            </button>
+            {/* Language grid */}
+            <div className="p-4 overflow-y-auto" style={{ maxHeight: 'calc(85vh - 140px)' }}>
+              <div className="grid grid-cols-3 gap-2.5">
+                {langs.map(lang => {
+                  const lm = LANG_META[lang] || { flag: '🌐', label: lang, color: '#666' };
+                  const count = servers.filter(s => (s.lang || 'EN') === lang).length;
+                  const isActive = selectedLang === lang && phase !== 'select';
+                  return (
+                    <button
+                      key={lang}
+                      onClick={() => startScan(lang)}
+                      className={`group flex flex-col items-center gap-2.5 p-4 rounded-2xl border transition-all duration-200 hover:scale-[1.03] active:scale-95 ${
+                        isActive
+                          ? 'border-transparent scale-[1.03]'
+                          : 'bg-white/[0.03] border-white/[0.07] hover:border-white/15 hover:bg-white/[0.06]'
+                      }`}
+                      style={isActive ? {
+                        background: `${lm.color}20`,
+                        borderColor: `${lm.color}60`,
+                        boxShadow: `0 0 20px ${lm.color}25`,
+                      } : {}}
+                    >
+                      <span className="text-4xl leading-none filter drop-shadow-lg">{lm.flag}</span>
+                      <span className="text-white text-[11px] font-black">{lm.label}</span>
+                      <span className="text-white/30 text-[9px] font-bold">{count} server{count !== 1 ? 's' : ''}</span>
+                      {isActive && (
+                        <span
+                          className="text-[8px] font-black px-2 py-0.5 rounded-full"
+                          style={{ background: `${lm.color}30`, color: lm.color }}
+                        >
+                          ACTIVE
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
-
-          {/* Info */}
-          <p className="text-[9px] text-[#444] text-center">
-            <AlertCircle className="w-3 h-3 inline mr-1 text-[#555]" />
-            কোনো server কাজ না করলে Next Server চাপুন — 🇮🇳 = Hindi Dubbed
-          </p>
         </div>
       )}
     </div>
