@@ -95,22 +95,22 @@ export default async function WatchMoviePage({
         )}
       </div>
 
-      <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-8 -mt-52 pt-16 relative z-10 pb-20">
-        <Link href="/movies" className="inline-flex items-center gap-2 text-sm text-[#999] hover:text-white transition-colors mb-6">
-          <ChevronLeft className="w-4 h-4" /> Back to Movies
-        </Link>
+      <div className="max-w-[1320px] mx-auto px-4 md:px-6 lg:px-8 pt-4 relative z-10 pb-20">
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-start">
 
           {/* Main Column */}
           <div className="space-y-5">
 
+            {/* ── Multi-Server Player (YouTube Top Position) ────────────────────────────────── */}
+            <MultiServerPlayer servers={servers} title={movie.title} />
+
             {/* Episode Prev/Next for Series */}
             {isSeries && (
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between bg-[#111118] border border-white/[0.06] p-4 rounded-2xl">
                 <Link
                   href={parseInt(episode) > 1 ? `/watch/movie/${movie.id}?season=${season}&episode=${parseInt(episode) - 1}` : '#'}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
                     parseInt(episode) > 1
                       ? 'bg-white/[0.04] border-white/[0.08] text-[#999] hover:text-white hover:border-[#8B5CF6]/40'
                       : 'bg-white/[0.02] border-white/[0.03] text-[#444] cursor-not-allowed'
@@ -123,15 +123,12 @@ export default async function WatchMoviePage({
                 </span>
                 <Link
                   href={`/watch/movie/${movie.id}?season=${season}&episode=${parseInt(episode) + 1}`}
-                  className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border bg-gradient-to-r from-[#8B5CF6]/10 to-[#EC4899]/10 border-[#8B5CF6]/20 text-[#A78BFA] hover:text-white hover:border-[#8B5CF6]/50"
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border bg-gradient-to-r from-[#8B5CF6]/20 to-[#EC4899]/20 border-[#8B5CF6]/30 text-white hover:border-[#8B5CF6]/60"
                 >
                   Next Episode <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
             )}
-
-            {/* ── Multi-Server Player ────────────────────────────────── */}
-            <MultiServerPlayer servers={servers} title={movie.title} />
 
             {/* Episode Selector for Series */}
             {isSeries && movie.seasonsDetail && movie.seasonsDetail.length > 0 && (

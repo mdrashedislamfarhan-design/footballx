@@ -145,54 +145,50 @@ export default async function AnimeDetailPage({
         <div className="absolute inset-0 bg-[#0a0a0f]/40" />
       </div>
 
-      <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-8 -mt-28 pt-8 relative z-10 pb-20">
+      <div className="max-w-[1320px] mx-auto px-4 md:px-6 lg:px-8 pt-4 relative z-10 pb-20">
         
-        {/* Back Link */}
-        <Link href="/" className="inline-flex items-center gap-2 text-sm text-[#999] hover:text-white transition-colors mb-6">
-          <ChevronLeft className="w-4 h-4" /> Back to Home
-        </Link>
-
-        {/* Dynamic Grid: Player + Sidebar Info */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
+        {/* Dynamic Grid: Player + Sidebar Info (YouTube Style) */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 items-start">
           
           {/* Main Column: Player & Episode list */}
-          <div className="space-y-6">
+          <div className="space-y-5">
             
-            {/* Title above player on mobile */}
-            <div className="lg:hidden mb-4">
-              <h1 className="text-2xl md:text-3xl font-black mb-1">{title}</h1>
-              <p className="text-xs text-[#8B5CF6] font-extrabold">Episode {ep} of {totalEpisodes}</p>
-            </div>
-
-            {/* Episode Prev/Next Navigation */}
-            <div className="flex items-center justify-between">
-              <Link
-                href={ep > 1 ? `/anime/${anime.id}?ep=${ep - 1}` : '#'}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
-                  ep > 1
-                    ? 'bg-white/[0.04] border-white/[0.08] text-[#999] hover:text-white hover:border-[#8B5CF6]/40'
-                    : 'bg-white/[0.02] border-white/[0.03] text-[#444] cursor-not-allowed'
-                }`}
-              >
-                <ChevronLeft className="w-4 h-4" /> Prev Episode
-              </Link>
-              <span className="text-xs font-black text-[#8B5CF6] bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 px-4 py-2 rounded-xl">
-                Episode {ep} / {totalEpisodes}
-              </span>
-              <Link
-                href={ep < totalEpisodes ? `/anime/${anime.id}?ep=${ep + 1}` : '#'}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
-                  ep < totalEpisodes
-                    ? 'bg-gradient-to-r from-[#8B5CF6]/10 to-[#EC4899]/10 border-[#8B5CF6]/20 text-[#A78BFA] hover:text-white hover:border-[#8B5CF6]/50'
-                    : 'bg-white/[0.02] border-white/[0.03] text-[#444] cursor-not-allowed'
-                }`}
-              >
-                Next Episode <ChevronRight className="w-4 h-4" />
-              </Link>
-            </div>
-
-            {/* Embedded MultiServerPlayer */}
+            {/* 1. Video Player (YouTube Top Position) */}
             <MultiServerPlayer servers={servers} title={title} />
+
+            {/* 2. Episode Prev/Next Navigation & Title Bar (YouTube Info Bar Below Player) */}
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-[#111118] border border-white/[0.06] p-4 rounded-2xl">
+              <div>
+                <h1 className="text-xl md:text-2xl font-black text-white">{title}</h1>
+                <p className="text-xs text-[#8B5CF6] font-bold mt-0.5">Episode {ep} of {totalEpisodes}</p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Link
+                  href={ep > 1 ? `/anime/${anime.id}?ep=${ep - 1}` : '#'}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
+                    ep > 1
+                      ? 'bg-white/[0.04] border-white/[0.08] text-[#999] hover:text-white hover:border-[#8B5CF6]/40'
+                      : 'bg-white/[0.02] border-white/[0.03] text-[#444] cursor-not-allowed'
+                  }`}
+                >
+                  <ChevronLeft className="w-4 h-4" /> Prev
+                </Link>
+                <span className="text-xs font-black text-[#8B5CF6] bg-[#8B5CF6]/10 border border-[#8B5CF6]/20 px-3 py-2 rounded-xl">
+                  Ep {ep} / {totalEpisodes}
+                </span>
+                <Link
+                  href={ep < totalEpisodes ? `/anime/${anime.id}?ep=${ep + 1}` : '#'}
+                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
+                    ep < totalEpisodes
+                      ? 'bg-gradient-to-r from-[#8B5CF6]/20 to-[#EC4899]/20 border-[#8B5CF6]/30 text-white hover:border-[#8B5CF6]/60'
+                      : 'bg-white/[0.02] border-white/[0.03] text-[#444] cursor-not-allowed'
+                  }`}
+                >
+                  Next <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
 
             {/* Episode & Season Grid Selector */}
             <div className="bg-[#111118] border border-white/[0.06] p-6 rounded-[24px] space-y-6">

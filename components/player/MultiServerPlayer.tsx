@@ -91,17 +91,11 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
         </>
       )}
 
-      {/* Alert banner */}
-      <div className="w-full bg-[#EF4444] text-white text-xs font-black px-4 py-2 flex items-center justify-between shadow-md">
-        <span>🔔 If default server doesn&apos;t work, click any flag/server below to change instantly.</span>
-        <button onClick={() => setModalOpen(true)} className="underline hover:opacity-80 font-black">All Servers ({servers.length})</button>
-      </div>
-
       {/* ── Main Player Frame ─────────────────────────────────────────────────── */}
       <div className={`relative bg-[#08080f] overflow-hidden ${
         theaterMode
           ? 'fixed top-2 left-1/2 -translate-x-1/2 w-[98vw] max-w-[1700px] h-[88vh] z-50 rounded-[28px]'
-          : 'w-full h-[38vh] max-h-[420px] min-h-[200px] rounded-t-[20px]'
+          : 'aspect-video w-full rounded-2xl border border-white/[0.08] shadow-2xl'
       }`}>
 
         {/* Currently playing badge */}
