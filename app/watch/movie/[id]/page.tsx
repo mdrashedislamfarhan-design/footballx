@@ -31,19 +31,19 @@ export default async function WatchMoviePage({
 
   // ── Build clean list of 10 working movie servers (5 Multi-Audio, 5 English) ──
   const servers: ServerConfig[] = [
-    // 🇮🇳 Multi-Audio / Hindi Dubbed (5 Servers)
-    { name: 'Stvvid Multi', icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.to/embed/tv/${ref}/${season}/${episode}` : `https://vidsrc.to/embed/movie/${ref}` },
-    { name: 'Ophm Multi',   icon: 'IN', lang: 'HI', url: isSeries ? `https://vidsrc.me/embed/tv/${ref}/${season}/${episode}` : `https://vidsrc.me/embed/movie/${ref}` },
-    { name: 'Lolly Multi',  icon: 'IN', lang: 'HI', url: isSeries ? `https://vidlink.pro/embed/tv/${tmdb}/${season}/${episode}` : `https://vidlink.pro/embed/movie/${tmdb}` },
-    { name: 'Prvibd Multi', icon: 'IN', lang: 'HI', url: isSeries ? `https://embed.su/embed/tv/${tmdb}/${season}/${episode}` : `https://embed.su/embed/movie/${tmdb}` },
-    { name: 'AwsPly Multi', icon: 'IN', lang: 'HI', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}` : `https://autoembed.co/movie/tmdb/${tmdb}` },
+    // 🇮🇳 Multi-Audio / Hindi Dubbed (5 Dedicated Multi-Lang Servers)
+    { name: 'Lolly Multi',  icon: 'IN', lang: 'HI', url: isSeries ? `https://vidlink.pro/embed/tv/${tmdb}/${season}/${episode}`                     : `https://vidlink.pro/embed/movie/${tmdb}` },
+    { name: 'Prvibd Multi', icon: 'IN', lang: 'HI', url: isSeries ? `https://embed.su/embed/tv/${tmdb}/${season}/${episode}`                        : `https://embed.su/embed/movie/${tmdb}` },
+    { name: 'AwsPly Multi', icon: 'IN', lang: 'HI', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
+    { name: 'Nitro Multi',  icon: 'IN', lang: 'HI', url: isSeries ? `https://multiembed.mov/?video_id=${tmdb}&s=${season}&e=${episode}&lang=hi`    : `https://multiembed.mov/?video_id=${tmdb}&lang=hi` },
+    { name: 'MbPly Multi',  icon: 'IN', lang: 'HI', url: isSeries ? `https://multiembed.eu.org/?video_id=${tmdb}&s=${season}&e=${episode}&lang=hi` : `https://multiembed.eu.org/?video_id=${tmdb}&lang=hi` },
 
-    // 🇺🇸 English & Global (5 Servers)
-    { name: 'Cinemaos Eng', icon: 'US', lang: 'EN', url: isSeries ? `https://vidsrc.to/embed/tv/${ref}/${season}/${episode}` : `https://vidsrc.to/embed/movie/${ref}` },
-    { name: 'Prime Eng',    icon: 'US', lang: 'EN', url: isSeries ? `https://vidlink.pro/embed/tv/${tmdb}/${season}/${episode}` : `https://vidlink.pro/embed/movie/${tmdb}` },
-    { name: 'Netflix Eng',  icon: 'US', lang: 'EN', url: isSeries ? `https://embed.su/embed/tv/${tmdb}/${season}/${episode}` : `https://embed.su/embed/movie/${tmdb}` },
-    { name: 'Hotstar Eng',  icon: 'US', lang: 'EN', url: isSeries ? `https://vidsrc.me/embed/tv/${ref}/${season}/${episode}` : `https://vidsrc.me/embed/movie/${ref}` },
-    { name: 'Vidnest Eng', icon: 'GB', lang: 'EN', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}` : `https://autoembed.co/movie/tmdb/${tmdb}` },
+    // 🇺🇸 English & Global (5 Original Audio Servers)
+    { name: 'Stvvid Eng',   icon: 'US', lang: 'EN', url: isSeries ? `https://vidsrc.to/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.to/embed/movie/${ref}` },
+    { name: 'Ophm Eng',     icon: 'US', lang: 'EN', url: isSeries ? `https://vidsrc.me/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.me/embed/movie/${ref}` },
+    { name: 'Cinemaos Eng', icon: 'US', lang: 'EN', url: isSeries ? `https://vidlink.pro/embed/tv/${tmdb}/${season}/${episode}`                     : `https://vidlink.pro/embed/movie/${tmdb}` },
+    { name: 'Prime Eng',    icon: 'US', lang: 'EN', url: isSeries ? `https://embed.su/embed/tv/${tmdb}/${season}/${episode}`                        : `https://embed.su/embed/movie/${tmdb}` },
+    { name: 'Netflix Eng',  icon: 'GB', lang: 'EN', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
   ];
 
   const recommendations = await fetchHollywoodMovies();

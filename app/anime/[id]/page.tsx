@@ -83,12 +83,12 @@ export default async function AnimeDetailPage({
     { name: 'Vid2Dub Eng', icon: 'GB', lang: 'DUB', url: `https://vidsrc.to/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
     { name: 'CastDub Eng', icon: 'US', lang: 'DUB', url: `https://embed.su/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
 
-    // 🇮🇳 Multi-Audio / Hindi Dubbed (5 Servers)
+    // 🇮🇳 Multi-Audio / Hindi Dubbed (5 Dedicated Multi-Lang Servers)
     { name: 'Vidfast Multi', icon: 'IN', lang: 'HI', url: `https://vidlink.pro/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}?primaryColor=8B5CF6` },
-    { name: 'Flicky Multi',  icon: 'IN', lang: 'HI', url: `https://embed.su/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
     { name: 'Mplay Multi',   icon: 'IN', lang: 'HI', url: `https://autoembed.co/tv/tmdb/${resolvedTmdbId}-${tmdbSeason}-${ep}` },
-    { name: 'Hmovies Multi', icon: 'IN', lang: 'HI', url: `https://vidsrc.to/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'NHD Multi',     icon: 'IN', lang: 'HI', url: `https://vidsrc.me/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    { name: 'Flicky Multi',  icon: 'IN', lang: 'HI', url: `https://embed.su/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    { name: 'Nitro Multi',   icon: 'IN', lang: 'HI', url: `https://multiembed.mov/?video_id=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}&lang=hi` },
+    { name: 'MbPly Multi',   icon: 'IN', lang: 'HI', url: `https://multiembed.eu.org/?video_id=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}&lang=hi` },
   ];
 
   const totalEpisodes = Math.max(
