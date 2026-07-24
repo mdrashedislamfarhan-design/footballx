@@ -130,7 +130,7 @@ export default async function AnimeDetailPage({
       />
 
       {/* Banner Backdrop */}
-      <div className="relative h-[35vh] w-full overflow-hidden">
+      <div className="relative h-[22vh] w-full overflow-hidden">
         {anime.bannerImage ? (
           <>
             <img src={anime.bannerImage} alt="" className="absolute inset-0 w-full h-full object-cover opacity-30 blur-[4px]" />
@@ -145,7 +145,7 @@ export default async function AnimeDetailPage({
         <div className="absolute inset-0 bg-[#0a0a0f]/40" />
       </div>
 
-      <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-8 -mt-48 pt-16 relative z-10 pb-20">
+      <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-8 -mt-28 pt-8 relative z-10 pb-20">
         
         {/* Back Link */}
         <Link href="/" className="inline-flex items-center gap-2 text-sm text-[#999] hover:text-white transition-colors mb-6">
