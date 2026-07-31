@@ -40,16 +40,6 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
       {/* ── Main Video Player Frame (Standard 16:9) ─────────────────────────── */}
       <div className="relative bg-[#08080f] overflow-hidden aspect-video w-full rounded-2xl border border-white/[0.08] shadow-2xl">
 
-        {/* Top Badge Overlay */}
-        <div className="absolute top-3 inset-x-3 z-30 flex items-center pointer-events-none">
-          {/* Active Server Badge */}
-          {activeServer && (
-            <div className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 bg-black/75 backdrop-blur-md border border-white/10 rounded-xl text-white text-xs font-bold shadow-md">
-              <CountryFlag code={activeServer.icon} size={16} />
-              <span className="text-white/90">Playing on: <strong className="text-[#8B5CF6]">{activeServer.name}</strong></span>
-            </div>
-          )}
-        </div>
 
         {/* Video iframe */}
         {currentUrl ? (
