@@ -88,29 +88,25 @@ export default async function AnimeDetailPage({
     || streamId;
   const tmdbSeason = getSeasonFromTitle(title);
 
-  // ── Build the full server list ────────────────────────────────────────
-  // ── Build 15 COMPLETELY UNIQUE & DISTINCT server providers ───────────────
+  // ── Build 12 UNIQUE, top-class, numbered servers ─────────────────────────
   const servers: ServerConfig[] = [
-    // 🎌 Japanese Sub / Original (5 Distinct Servers)
-    { name: 'Nitro Sub',   icon: 'JP', lang: 'SUB', url: `https://vidlink.pro/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}?primaryColor=8B5CF6` },
-    { name: 'CastVid Sub', icon: 'JP', lang: 'SUB', url: `https://embed.su/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'AutoSub',     icon: 'JP', lang: 'SUB', url: `https://autoembed.co/tv/tmdb/${resolvedTmdbId}-${tmdbSeason}-${ep}` },
-    { name: 'OnVid Sub',   icon: 'JP', lang: 'SUB', url: `https://vidsrc.to/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'ZetSub',      icon: 'JP', lang: 'SUB', url: `https://vidsrc.me/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    // 🎌 Japanese Sub (Original Audio)
+    { name: 'Server 1',  icon: 'JP', lang: 'SUB', url: `https://vidlink.pro/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}?primaryColor=8B5CF6` },
+    { name: 'Server 2',  icon: 'JP', lang: 'SUB', url: `https://vidsrc.to/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    { name: 'Server 3',  icon: 'JP', lang: 'SUB', url: `https://embed.su/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    { name: 'Server 4',  icon: 'JP', lang: 'SUB', url: `https://autoembed.co/tv/tmdb/${resolvedTmdbId}-${tmdbSeason}-${ep}` },
 
-    // 🇺🇸 English Dubbed (5 Distinct Servers)
-    { name: 'VidDub Eng',  icon: 'US', lang: 'DUB', url: `https://vidsrc.pm/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'Vidsrc Dub',  icon: 'US', lang: 'DUB', url: `https://vidsrc.xyz/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'AutoDub Eng', icon: 'GB', lang: 'DUB', url: `https://vidsrc.net/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'Vid2Dub Eng', icon: 'GB', lang: 'DUB', url: `https://vidsrc.rip/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
-    { name: 'CastDub Eng', icon: 'US', lang: 'DUB', url: `https://vidsrc.in/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    // 🇺🇸 English Dub
+    { name: 'Server 5',  icon: 'US', lang: 'DUB', url: `https://vidsrc.cc/v2/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    { name: 'Server 6',  icon: 'US', lang: 'DUB', url: `https://player.videasy.net/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    { name: 'Server 7',  icon: 'US', lang: 'DUB', url: `https://www.2embed.cc/embedtv/${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}` },
+    { name: 'Server 8',  icon: 'US', lang: 'DUB', url: `https://moviesapi.club/tv/${resolvedTmdbId}-${tmdbSeason}-${ep}` },
 
-    // 🇮🇳 Multi-Audio / Hindi Dubbed (5 Distinct Servers)
-    { name: 'Vidfast Multi', icon: 'IN', lang: 'HI', url: `https://multiembed.mov/?video_id=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}&lang=hi` },
-    { name: 'Mplay Multi',   icon: 'IN', lang: 'HI', url: `https://multiembed.eu.org/?video_id=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}&lang=hi` },
-    { name: 'Flicky Multi',  icon: 'IN', lang: 'HI', url: `https://www.2embed.cc/embedtv/${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}` },
-    { name: 'Nitro Multi',   icon: 'IN', lang: 'HI', url: `https://embed.smashystream.com/playere.php?tmdb=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}` },
-    { name: 'MbPly Multi',   icon: 'IN', lang: 'HI', url: `https://www.NontonGo.net/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    // 🌐 Multi-Audio / Hindi
+    { name: 'Server 9',  icon: 'IN', lang: 'MULTI', url: `https://multiembed.mov/?video_id=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}` },
+    { name: 'Server 10', icon: 'IN', lang: 'MULTI', url: `https://embed.smashystream.com/playere.php?tmdb=${resolvedTmdbId}&s=${tmdbSeason}&e=${ep}` },
+    { name: 'Server 11', icon: 'IN', lang: 'MULTI', url: `https://vidsrc.xyz/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
+    { name: 'Server 12', icon: 'IN', lang: 'MULTI', url: `https://vidsrc.pm/embed/tv/${resolvedTmdbId}/${tmdbSeason}/${ep}` },
   ];
 
   const totalEpisodes = Math.max(

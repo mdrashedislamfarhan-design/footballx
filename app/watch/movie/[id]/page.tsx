@@ -29,21 +29,25 @@ export default async function WatchMoviePage({
   const tmdb = movie.tmdbId;
   const ref  = imdb || String(tmdb);   // fallback to numeric tmdb id
 
-  // ── Build clean list of 10 working movie servers (5 Multi-Audio, 5 English) ──
+  // ── Build 12 UNIQUE, top-class, numbered servers ─────────────────────────
   const servers: ServerConfig[] = [
-    // 🇮🇳 Multi-Audio / Hindi Dubbed (5 Dedicated Multi-Lang Servers)
-    { name: 'Lolly Multi',  icon: 'IN', lang: 'HI', url: isSeries ? `https://vidlink.pro/embed/tv/${tmdb}/${season}/${episode}`                     : `https://vidlink.pro/embed/movie/${tmdb}` },
-    { name: 'Prvibd Multi', icon: 'IN', lang: 'HI', url: isSeries ? `https://embed.su/embed/tv/${tmdb}/${season}/${episode}`                        : `https://embed.su/embed/movie/${tmdb}` },
-    { name: 'AwsPly Multi', icon: 'IN', lang: 'HI', url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                    : `https://autoembed.co/movie/tmdb/${tmdb}` },
-    { name: 'Nitro Multi',  icon: 'IN', lang: 'HI', url: isSeries ? `https://multiembed.mov/?video_id=${tmdb}&s=${season}&e=${episode}&lang=hi`    : `https://multiembed.mov/?video_id=${tmdb}&lang=hi` },
-    { name: 'MbPly Multi',  icon: 'IN', lang: 'HI', url: isSeries ? `https://multiembed.eu.org/?video_id=${tmdb}&s=${season}&e=${episode}&lang=hi` : `https://multiembed.eu.org/?video_id=${tmdb}&lang=hi` },
+    // 🎬 Server 1-4: Top English/Multi-Audio Servers
+    { name: 'Server 1',  icon: 'US', lang: 'EN',    url: isSeries ? `https://vidlink.pro/embed/tv/${tmdb}/${season}/${episode}`                   : `https://vidlink.pro/embed/movie/${tmdb}` },
+    { name: 'Server 2',  icon: 'US', lang: 'EN',    url: isSeries ? `https://vidsrc.to/embed/tv/${ref}/${season}/${episode}`                      : `https://vidsrc.to/embed/movie/${ref}` },
+    { name: 'Server 3',  icon: 'US', lang: 'EN',    url: isSeries ? `https://embed.su/embed/tv/${tmdb}/${season}/${episode}`                      : `https://embed.su/embed/movie/${tmdb}` },
+    { name: 'Server 4',  icon: 'US', lang: 'EN',    url: isSeries ? `https://player.videasy.net/tv/${tmdb}/${season}/${episode}`                  : `https://player.videasy.net/movie/${tmdb}` },
 
-    // 🇺🇸 English & Global (5 Distinct Original Audio Servers)
-    { name: 'Stvvid Eng',   icon: 'US', lang: 'EN', url: isSeries ? `https://vidsrc.to/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.to/embed/movie/${ref}` },
-    { name: 'Ophm Eng',     icon: 'US', lang: 'EN', url: isSeries ? `https://vidsrc.me/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.me/embed/movie/${ref}` },
-    { name: 'Cinemaos Eng', icon: 'US', lang: 'EN', url: isSeries ? `https://vidsrc.pm/embed/tv/${ref}/${season}/${episode}`                        : `https://vidsrc.pm/embed/movie/${ref}` },
-    { name: 'Prime Eng',    icon: 'US', lang: 'EN', url: isSeries ? `https://vidsrc.xyz/embed/tv/${tmdb}/${season}/${episode}`                       : `https://vidsrc.xyz/embed/movie/${tmdb}` },
-    { name: 'Netflix Eng',  icon: 'GB', lang: 'EN', url: isSeries ? `https://vidsrc.net/embed/tv/${tmdb}/${season}/${episode}`                       : `https://vidsrc.net/embed/movie/${tmdb}` },
+    // 🎬 Server 5-8: More English/Global Servers
+    { name: 'Server 5',  icon: 'US', lang: 'EN',    url: isSeries ? `https://autoembed.co/tv/tmdb/${tmdb}-${season}-${episode}`                  : `https://autoembed.co/movie/tmdb/${tmdb}` },
+    { name: 'Server 6',  icon: 'US', lang: 'EN',    url: isSeries ? `https://vidsrc.cc/v2/embed/tv/${tmdb}/${season}/${episode}`                  : `https://vidsrc.cc/v2/embed/movie/${tmdb}` },
+    { name: 'Server 7',  icon: 'US', lang: 'EN',    url: isSeries ? `https://moviesapi.club/tv/${tmdb}-${season}-${episode}`                     : `https://moviesapi.club/movie/${tmdb}` },
+    { name: 'Server 8',  icon: 'US', lang: 'EN',    url: isSeries ? `https://www.2embed.cc/embedtv/${tmdb}&s=${season}&e=${episode}`              : `https://www.2embed.cc/embed/${ref}` },
+
+    // 🌐 Server 9-12: Multi-Audio / Hindi
+    { name: 'Server 9',  icon: 'IN', lang: 'MULTI', url: isSeries ? `https://multiembed.mov/?video_id=${tmdb}&s=${season}&e=${episode}&lang=hi`   : `https://multiembed.mov/?video_id=${tmdb}&lang=hi` },
+    { name: 'Server 10', icon: 'IN', lang: 'MULTI', url: isSeries ? `https://multiembed.eu.org/?video_id=${tmdb}&s=${season}&e=${episode}&lang=hi`: `https://multiembed.eu.org/?video_id=${tmdb}&lang=hi` },
+    { name: 'Server 11', icon: 'IN', lang: 'MULTI', url: isSeries ? `https://embed.smashystream.com/playere.php?tmdb=${tmdb}&s=${season}&e=${episode}` : `https://embed.smashystream.com/playere.php?tmdb=${tmdb}` },
+    { name: 'Server 12', icon: 'IN', lang: 'MULTI', url: isSeries ? `https://vidsrc.xyz/embed/tv/${tmdb}/${season}/${episode}`                    : `https://vidsrc.xyz/embed/movie/${tmdb}` },
   ];
 
   const recommendations = await fetchHollywoodMovies();

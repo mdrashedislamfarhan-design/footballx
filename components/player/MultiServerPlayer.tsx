@@ -75,29 +75,40 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
           <h3 className="text-xs font-extrabold text-white uppercase tracking-wider">Select Working Server:</h3>
         </div>
 
-        {/* Grid of Working Servers (3-4 Columns) */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2.5">
+        {/* Grid of Working Servers */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
           {servers.map((srv, idx) => {
             const isPlaying = activeServer?.name === srv.name;
+            const langColor =
+              srv.lang === 'SUB'   ? 'bg-violet-500/20 text-violet-300 border-violet-500/30' :
+              srv.lang === 'DUB'   ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' :
+              srv.lang === 'MULTI' ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' :
+                                     'bg-white/10 text-white/50 border-white/10';
             return (
               <button
                 key={idx}
                 onClick={() => handleSelectServer(srv)}
-                className={`flex items-center justify-between p-3 rounded-xl border text-xs font-extrabold transition-all duration-200 hover:scale-[1.02] active:scale-95 ${
+                className={`flex flex-col gap-1.5 p-3 rounded-xl border text-xs font-bold transition-all duration-200 hover:scale-[1.02] active:scale-95 text-left ${
                   isPlaying
-                    ? 'bg-gradient-to-r from-[#8B5CF6] to-[#EC4899] border-transparent text-white shadow-[0_0_15px_rgba(139,92,246,0.4)]'
-                    : 'bg-white/[0.03] border-white/10 text-white/80 hover:bg-white/[0.08] hover:text-white'
+                    ? 'bg-gradient-to-br from-[#8B5CF6] to-[#EC4899] border-transparent text-white shadow-[0_0_18px_rgba(139,92,246,0.5)]'
+                    : 'bg-white/[0.03] border-white/10 text-white/80 hover:bg-white/[0.07] hover:text-white hover:border-white/20'
                 }`}
               >
-                <div className="flex items-center gap-2.5 truncate">
-                  <CountryFlag code={srv.icon} size={18} />
-                  <span className="truncate max-w-[90px]">{srv.name}</span>
-                </div>
-
-                {isPlaying && (
-                  <div className="w-4 h-4 rounded-full bg-white text-[#8B5CF6] flex items-center justify-center text-[10px] font-black shrink-0">
-                    ✓
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-2">
+                    <CountryFlag code={srv.icon} size={16} />
+                    <span className="font-extrabold">{srv.name}</span>
                   </div>
+                  {isPlaying && (
+                    <div className="w-4 h-4 rounded-full bg-white text-[#8B5CF6] flex items-center justify-center text-[9px] font-black shrink-0">✓</div>
+                  )}
+                </div>
+                {srv.lang && (
+                  <span className={`self-start text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md border ${
+                    isPlaying ? 'bg-white/20 text-white border-white/30' : langColor
+                  }`}>
+                    {srv.lang}
+                  </span>
                 )}
               </button>
             );
