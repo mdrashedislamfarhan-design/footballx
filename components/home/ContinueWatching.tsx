@@ -98,7 +98,9 @@ export default function ContinueWatching() {
                   {item.title}
                 </h3>
                 <p className="text-[10px] text-[#666] font-bold flex items-center justify-between">
-                  <span>{item.mediaType === 'anime' ? '🎌 Anime' : '🎬 Movie'}</span>
+                  <span>
+                    {item.mediaType === 'anime' ? '🎌 Anime' : item.mediaType === 'series' ? '📺 Series' : '🎬 Movie'}
+                  </span>
                   <span className="text-[#8B5CF6]">Resume →</span>
                 </p>
               </div>

@@ -55,6 +55,17 @@ export default async function WatchMoviePage({
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white">
+      {/* Watch Tracker — saves to Continue Watching */}
+      <WatchTracker
+        id={`movie-${movie.id}`}
+        title={movie.title}
+        coverImage={movie.coverImage || movie.bannerImage || ''}
+        url={isSeries ? `/watch/movie/${movie.id}?season=${season}&episode=${episode}` : `/watch/movie/${movie.id}`}
+        episode={isSeries ? parseInt(episode) : undefined}
+        season={isSeries ? parseInt(season) : undefined}
+        mediaType={isSeries ? 'series' : 'movie'}
+      />
+
       {/* Backdrop */}
       <div className="relative h-[40vh] w-full overflow-hidden">
         {movie.bannerImage && (
