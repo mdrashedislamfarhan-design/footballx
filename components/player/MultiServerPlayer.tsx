@@ -38,25 +38,39 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
     <div className="w-full space-y-4">
 
       {/* ── Main Video Player Frame (Standard 16:9) ─────────────────────────── */}
-      <div className="relative bg-[#08080f] overflow-hidden aspect-video w-full rounded-2xl border border-white/[0.08] shadow-2xl">
-
-
+      <div
+        className="relative bg-[#08080f] aspect-video w-full rounded-2xl border border-white/[0.08] shadow-2xl"
+        style={{ overflow: 'hidden' }}
+      >
         {/* Video iframe */}
         {currentUrl ? (
           <iframe
             key={currentUrl}
             src={currentUrl}
-            className="w-full h-full border-0"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              border: 'none',
+            }}
             allowFullScreen
-            allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+            // @ts-ignore
+            allowfullscreen="true"
+            webkitallowfullscreen="true"
+            mozallowfullscreen="true"
+            allow="autoplay; fullscreen; picture-in-picture; encrypted-media; web-share; accelerometer; gyroscope"
             referrerPolicy="origin"
+            scrolling="no"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-white/40 text-sm font-bold">
+          <div className="absolute inset-0 flex items-center justify-center text-white/40 text-sm font-bold">
             Select a server below to start streaming
           </div>
         )}
       </div>
+
 
       {/* ── SIMPLE & CLEAN WORKING SERVERS LIST BELOW PLAYER ────────────────── */}
       <div className="bg-[#111118] border border-white/[0.06] p-4 sm:p-5 rounded-2xl space-y-3">
