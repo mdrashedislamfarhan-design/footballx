@@ -433,6 +433,47 @@ export async function fetchTopRatedMovies(): Promise<Movie[]> {
     .map((m: TMDBMovie) => mapMovie(m, 'hollywood'));
 }
 
+// ── Fetch Superhero Movies (Marvel + DC + Superhero) ─────────────────────────
+export async function fetchSuperHeroMovies(): Promise<Movie[]> {
+  // keyword IDs: 9715=superhero, 155030=Marvel Comics, 180547=DC Comics
+  const [superhero, marvel, dc] = await Promise.all([
+    tmdb('/discover/movie', {
+      with_keywords: '9715',
+      sort_by: 'popularity.desc',
+      'vote_count.gte': 100,
+      'vote_average.gte': 5,
+    }),
+    tmdb('/discover/movie', {
+      with_keywords: '155030',
+      sort_by: 'popularity.desc',
+      'vote_count.gte': 50,
+    }),
+    tmdb('/discover/movie', {
+      with_keywords: '180547',
+      sort_by: 'popularity.desc',
+      'vote_count.gte': 50,
+    }),
+  ]);
+
+  const seen = new Set<number>();
+  const all: TMDBMovie[] = [
+    ...(superhero?.results || []),
+    ...(marvel?.results || []),
+    ...(dc?.results || []),
+  ];
+
+  return all
+    .filter((m: TMDBMovie) => {
+      if (!m.poster_path || seen.has(m.id)) return false;
+      seen.add(m.id);
+      return hasQuality(m, 30);
+    })
+    .sort((a, b) => (b.popularity || 0) - (a.popularity || 0))
+    .slice(0, 36)
+    .map((m: TMDBMovie) => mapMovie(m, 'hollywood'));
+}
+
+
 // ── Fetch Movies by Genre ───────────────────────────────────────────────────
 export async function fetchMoviesByGenre(genreId: number, type: 'movie' | 'tv' = 'movie', page = 1): Promise<Movie[]> {
   const endpoint = type === 'tv' ? '/discover/tv' : '/discover/movie';

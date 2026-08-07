@@ -19,6 +19,7 @@ interface MoviesExplorerProps {
   initialHollywoodMovies: Movie[];
   initialBollywoodMovies: Movie[];
   topRatedMovies: Movie[];
+  superHeroMovies: Movie[];
 }
 
 const GENRES = [
@@ -59,6 +60,7 @@ export default function MoviesExplorer({
   initialHollywoodMovies,
   initialBollywoodMovies,
   topRatedMovies,
+  superHeroMovies,
 }: MoviesExplorerProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -81,6 +83,7 @@ export default function MoviesExplorer({
       ...initialHollywoodMovies,
       ...initialBollywoodMovies,
       ...topRatedMovies,
+      ...superHeroMovies,
     ].forEach((m) => {
       if (m && m.id && !map.has(m.id)) {
         map.set(m.id, m);
@@ -152,6 +155,7 @@ export default function MoviesExplorer({
     amazonSeries,
     disneySeries,
     zee5Series,
+    superHeroMovies,
   ]);
 
   const isFiltering = searchQuery.trim() !== '' || selectedCategory !== 'all' || selectedGenre !== 'all';
@@ -325,6 +329,9 @@ export default function MoviesExplorer({
 
             {latest2026Movies.length > 0 && (
               <MovieRow title="⚡ 2026/2025 Latest Cinema Releases" movies={latest2026Movies} />
+            )}
+            {superHeroMovies.length > 0 && (
+              <MovieRow title="🦸 Superhero Universe — Marvel & DC" movies={superHeroMovies} />
             )}
             {southHindiMovies.length > 0 && (
               <MovieRow title="🔥 South Indian Blockbusters (Hindi Dubbed)" movies={southHindiMovies} />

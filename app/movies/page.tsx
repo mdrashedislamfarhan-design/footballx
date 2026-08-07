@@ -7,6 +7,7 @@ import {
   fetchSouthHindiDubbed,
   fetchAnimeMovies,
   fetchOttWebSeries,
+  fetchSuperHeroMovies,
 } from '@/services/movies/tmdb';
 import MovieHeroCarousel from '@/components/movies/MovieHeroCarousel';
 import MoviesExplorer from '@/components/movies/MoviesExplorer';
@@ -33,6 +34,7 @@ export default async function MoviesPage() {
   let bollywoodMovies: any[] = [];
   let nowPlaying: any[] = [];
   let topRated: any[] = [];
+  let superHeroMovies: any[] = [];
 
   const apiKeySet = !!(process.env.TMDB_API_KEY || process.env.TMDB_READ_ACCESS_TOKEN);
 
@@ -50,6 +52,7 @@ export default async function MoviesPage() {
       hlMov,
       blMov,
       topMv,
+      superHeroMv,
     ] = await Promise.all([
       fetchOttWebSeries('netflix'),
       fetchOttWebSeries('hbo'),
@@ -63,6 +66,7 @@ export default async function MoviesPage() {
       fetchHollywoodMovies(),
       fetchBollywoodMovies(),
       fetchTopRatedMovies(),
+      fetchSuperHeroMovies(),
     ]);
 
     netflix = netflixData;
@@ -77,6 +81,7 @@ export default async function MoviesPage() {
     hollywoodMovies = hlMov;
     bollywoodMovies = blMov;
     topRated = topMv;
+    superHeroMovies = superHeroMv;
 
     // Hero Banner: ONLY Movies (not web series), picked from latest + now playing + top rated
     const movieOnlyPool = [
@@ -127,6 +132,7 @@ export default async function MoviesPage() {
             initialHollywoodMovies={hollywoodMovies}
             initialBollywoodMovies={bollywoodMovies}
             topRatedMovies={topRated}
+            superHeroMovies={superHeroMovies}
           />
         )}
       </div>
