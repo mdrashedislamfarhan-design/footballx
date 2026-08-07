@@ -153,7 +153,7 @@ export default function MultiServerPlayer({ servers, title }: MultiServerPlayerP
             const langColor =
               srv.lang === 'SUB'   ? 'bg-violet-500/20 text-violet-300 border-violet-500/30' :
               srv.lang === 'DUB'   ? 'bg-blue-500/20 text-blue-300 border-blue-500/30' :
-              srv.lang === 'MULTI' ? 'bg-orange-500/20 text-orange-300 border-orange-500/30' :
+              srv.lang === 'HINDI' || srv.lang === 'MULTI' ? 'bg-amber-500/25 text-amber-300 border-amber-500/40 font-black' :
                                      'bg-white/10 text-white/50 border-white/10';
             return (
               <button
